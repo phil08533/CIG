@@ -35,6 +35,10 @@ This is an early greybox/atmosphere pass, not the finished game. The character m
 - **Enter** — Continue dialogue
 - **Esc** — Release mouse capture
 
+## End credits
+
+Keep contributor and asset attribution in [`CREDITS.md`](CREDITS.md). Portal Music is listed there as a potential music source; we will fill in the specific track and verify its attribution requirements when you choose one.
+
 ## Direction
 
 The production target is a deliberately low-poly, late-PS1-inspired first-person detective horror game: oppressive spaces, sparse combat, tactile clue inspection, cigarette/smoke as a focus mechanic, and choices with consequences.
