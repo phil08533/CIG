@@ -173,7 +173,7 @@ document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.mov
 document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='KeyF'&&!e.repeat)toggleSmoke();if(e.code==='Enter'&&$('dialogue').style.display==='block')$('continue').click();if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();});
 document.addEventListener('keyup',e=>keys[e.code]=false);
 $('smokeBtn').addEventListener('click',toggleSmoke);$('inspectBtn').addEventListener('click',interact);
-$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;startAudio();showDialogue(0);setTimeout(()=>{if(dialogueIndex===0)showDialogue(1)},5500);});
+$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;startAudio();$('log').textContent='COLE (V.O.): “A man can drown in this city without ever touching the bay.”';$('objective').textContent='OBJECTIVE: ANSWER THE DOOR';renderer.domElement.requestPointerLock?.();});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const clampRoom=()=>{camera.position.x=THREE.MathUtils.clamp(camera.position.x,-4.05,4.05);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-4.45,4.45);camera.position.y=1.65;};
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);time+=dt;
