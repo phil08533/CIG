@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>CIG — Ash & Embers</title>
+<style>
+:root{color-scheme:dark;--cyan:#a6c9d2;--amber:#e6a05a;--panel:rgba(7,10,14,.88)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#e9e1d5;font-family:Georgia,"Courier New",serif}
+canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.12;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.4) 3px),radial-gradient(ellipse at center,transparent 35%,#000 100%);mix-blend-mode:multiply}
+#hud{position:fixed;inset:0;z-index:4;pointer-events:none;text-shadow:0 2px 5px #000}
+#mast{position:absolute;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:start;gap:12px}
+#logo{font-family:"Courier New",monospace;font-size:19px;letter-spacing:.24em;font-weight:bold}#logo small{display:block;font-size:9px;letter-spacing:.17em;color:#b6a18a;margin-top:5px}
+#case{font-size:10px;line-height:1.8;letter-spacing:.12em;text-align:right;color:#b6c0c1}
+#chapter{position:absolute;top:95px;left:20px;max-width:330px;border-left:2px solid #c18b53;padding:9px 13px;background:linear-gradient(90deg,rgba(5,7,10,.82),transparent)}
+.kicker{font:10px "Courier New",monospace;letter-spacing:.18em;color:#e6ae70;margin-bottom:7px}#chapter h2{font-size:17px;font-weight:normal;margin:0 0 7px;letter-spacing:.04em}#chapter p{font-size:12px;line-height:1.55;color:#c3c0b9;margin:0}
+#crosshair{position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);opacity:.65}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#ded7c9}#crosshair:before{width:1px;height:15px;left:7px}#crosshair:after{height:1px;width:15px;top:7px}
+#hint{position:absolute;left:50%;top:calc(50% + 28px);transform:translateX(-50%);font:10px "Courier New",monospace;letter-spacing:.1em;color:#f1d8b5;white-space:nowrap}
+#bottom{position:absolute;bottom:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:end;gap:10px}
+#log{font-size:10px;line-height:1.8;letter-spacing:.06em;color:#b7b6b0;background:rgba(5,7,10,.78);border:1px solid #aab7b522;padding:8px 11px;max-width:65vw}
+#actions{pointer-events:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}button{font:10px "Courier New",monospace;letter-spacing:.08em;color:#e8dfd1;background:#121417eF;border:1px solid #aa9b8355;padding:10px 12px;cursor:pointer}button:hover{background:#34271e;border-color:#d6a56b}button:focus-visible{outline:2px solid #e6ae70}
+#dialogue{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);width:min(680px,calc(100vw - 28px));background:linear-gradient(135deg,rgba(7,8,10,.97),rgba(17,16,16,.94));border:1px solid #b08a5c88;padding:17px 19px;display:none;pointer-events:auto;box-shadow:0 12px 45px #000}
+#speaker{font:10px "Courier New",monospace;color:#e6ae70;letter-spacing:.2em;margin-bottom:9px}#line{font-size:15px;line-height:1.65;color:#eee5d7}#continue{float:right;margin-top:12px}
+#overlay{position:fixed;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(4,5,8,.68),rgba(4,5,8,.93)),radial-gradient(ellipse at 50% 40%,#43342a,#07090e 72%);padding:20px}
+#card{max-width:650px;width:100%;border:1px solid #b38a5b77;background:rgba(8,9,12,.92);padding:clamp(22px,5vw,48px);box-shadow:0 25px 100px #000}
+#card .eyebrow{font:10px "Courier New",monospace;letter-spacing:.3em;color:#dba568}#card h1{font-size:clamp(38px,8vw,68px);font-weight:normal;letter-spacing:.08em;margin:14px 0 4px}#card h1 span{color:#c58d54}#card h2{font:12px "Courier New",monospace;font-weight:normal;letter-spacing:.22em;color:#b8b3a8;margin:0 0 25px}#card p{color:#c7c0b5;font-size:14px;line-height:1.7}#start{margin-top:14px;background:#b98450;color:#100d0a;border:0;padding:13px 20px;font-weight:bold}#start:hover{background:#e1b27a}#card .small{font:10px "Courier New",monospace;line-height:1.8;color:#928e87;margin-top:19px}
+#smoke{position:absolute;right:20px;top:50%;transform:translateY(-50%);font:10px "Courier New",monospace;letter-spacing:.12em;color:#e6c7a2;text-align:right}#smoke b{display:block;font-size:18px;font-weight:normal;margin-top:4px}
+#fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:7;transition:opacity 1.5s}
+@media(max-width:600px){#chapter{top:105px;max-width:calc(100vw - 40px)}#case{font-size:8px}#log{max-width:52vw;font-size:9px}button{padding:9px 8px;font-size:9px}#smoke{top:auto;bottom:110px;right:15px}#dialogue{bottom:105px}}
+</style>
+</head>
+<body>
+<div id="grain"></div>
+<div id="hud">
+  <div id="mast"><div id="logo">CIG <small>AN INTERACTIVE NOIR</small></div><div id="case">PRIVATE ENQUIRIES<br>CASE FILE 001 — THE RETAINER</div></div>
+  <section id="chapter"><div class="kicker">ACT I · THE OFFICE OF LOST SOULS</div><h2 id="chapterTitle">The Retainer</h2><p id="chapterText">Midnight. A storm works the windows like a debt collector. Someone is waiting outside your office.</p><div id="objective" class="kicker" style="margin-top:10px;margin-bottom:0">OBJECTIVE: ANSWER THE DOOR</div></section>
+  <div id="crosshair"></div><div id="hint"></div><div id="smoke">SMOKE METER<b id="smokeValue">STEADY</b></div>
+  <div id="bottom"><div id="log">WASD MOVE · MOUSE LOOK · E INTERACT · F LIGHT CIGARETTE · ESC RELEASE MOUSE</div><div id="actions"><button id="smokeBtn">F · LIGHT MATCH</button><button id="inspectBtn">E · INSPECT</button></div></div>
+  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button></div>
+</div>
+<div id="fade"></div>
+<div id="overlay"><div id="card"><div class="eyebrow">A CIG INTERACTIVE STORY</div><h1>ASH <span>&</span><br>EMBERS</h1><h2>A DETECTIVE STORY IN THE FLOODED BASIN</h2><p>A city can drown a man without ever touching the bay. Tonight, someone has brought you a photograph, an iron key, and a story that doesn't quite add up.</p><p>Explore Cole's office. Find the details worth noticing. Meet Iris Vance. This is an early playable prototype: the atmosphere and interactions are being built before the full case.</p><button id="start">ENTER THE OFFICE</button><div class="small">WASD TO MOVE · MOUSE TO LOOK · E TO INTERACT · F TO LIGHT A MATCH<br>HEADPHONES RECOMMENDED · AUDIO STARTS AFTER YOU ENTER</div></div></div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+const $ = id => document.getElementById(id);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x090d12);
+scene.fog = new THREE.FogExp2(0x090d12, 0.052);
+const camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.05, 120);
+camera.position.set(0,1.65,4.6);
+const renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance'});
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const mats = {};
+function mat(name,color,roughness=1,opts={}){return mats[name]=new THREE.MeshStandardMaterial({color,roughness,...opts});}
+mat('wall',0x343435);mat('wallDark',0x171a1c);mat('floor',0x292522);mat('wood',0x39271c);mat('woodTop',0x4a3424);mat('metal',0x353c40,.65,{metalness:.65});mat('brass',0x957044,.45,{metalness:.65});mat('paper',0xb7a887);mat('paperDark',0x82745e);mat('glass',0x18252a,.2,{metalness:.3});mat('coat',0x4b4b3d);mat('skin',0x9b7561);mat('ink',0x29221c);mat('cig',0xbcb5a5);mat('ember',0xff5d16,.45,{emissive:0xff3200,emissiveIntensity:2});
+function box(name,x,y,z,sx,sy,sz,material,cast=true,receive=true){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),typeof material==='string'?mats[material]:material);o.name=name;o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=receive;scene.add(o);return o;}
+function cylinder(name,x,y,z,r1,r2,h,material,seg=8,rotX=0){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,seg),mats[material]);o.name=name;o.position.set(x,y,z);o.rotation.x=rotX;o.castShadow=true;scene.add(o);return o;}
+function addLight(color,intensity,pos,dist=12){const l=new THREE.PointLight(color,intensity,dist,2);l.position.set(...pos);scene.add(l);return l;}
+
+scene.add(new THREE.HemisphereLight(0x8798a7,0x211710,1.0));
+const ceilingLamp=addLight(0xffc17a,19,[0,3.1,-0.2],9);
+const deskLamp=addLight(0xffa64d,27,[-1.05,2.1,-.5],5);
+const windowLight=addLight(0x537a91,11,[0,2.4,-4.6],8);
+
+// Small, oppressive office.
+box('floor',0,-.13,0,9,.25,10,'floor');
+box('ceiling',0,3.5,0,9,.2,10,'wallDark');
+box('back wall',0,1.7,-4.9,9,3.5,.2,'wall');
+box('left wall',-4.4,1.7,0,.2,3.5,10,'wall');
+box('right wall',4.4,1.7,0,.2,3.5,10,'wall');
+box('front wall left',-3.15,1.7,4.9,2.5,3.5,.2,'wall');
+box('front wall right',3.15,1.7,4.9,2.5,3.5,.2,'wall');
+box('front lintel',0,3.05,4.9,3.8,.8,.2,'wall');
+for(let x=-4;x<4;x+=.6) box('floorboard',x,-.001,0,.012,.008,9,'wood',false,false);
+
+// Rain window and frame.
+box('window recess',0,2.15,-4.77,3.2,1.8,.08,'wallDark');
+box('window glass',0,2.15,-4.70,2.95,1.58,.035,'glass',false,false);
+for(const x of [-1.53,0,1.53]) box('window mullion',x,2.15,-4.65,.06,1.68,.09,'wood');
+box('window crossbar',0,2.15,-4.64,3.0,.055,.09,'wood');
+box('window sill',0,1.28,-4.55,3.25,.12,.3,'woodTop');
+const city=new THREE.Group();scene.add(city);
+for(let i=0;i<24;i++){const x=(Math.random()-.5)*22,z=-8-Math.random()*8,h=.5+Math.random()*4;const b=new THREE.Mesh(new THREE.BoxGeometry(.45+Math.random()*.9,h,.45),new THREE.MeshStandardMaterial({color:0x101b24,roughness:1}));b.position.set(x,h/2-0.1,z);city.add(b);for(let j=0;j<4;j++){const w=new THREE.Mesh(new THREE.BoxGeometry(.04,.05,.01),new THREE.MeshBasicMaterial({color:Math.random()>.5?0xb17848:0x4e7387}));w.position.set(x+(Math.random()-.5)*.5,Math.random()*h,z+.23);city.add(w)}}
+
+// Rain streaks outside the glass.
+const rainGeo=new THREE.BufferGeometry();const rainCount=650;const rainPositions=new Float32Array(rainCount*6);
+for(let i=0;i<rainCount;i++){const x=(Math.random()-.5)*15,y=Math.random()*9,z=-4.2-Math.random()*9;const k=i*6;rainPositions[k]=x;rainPositions[k+1]=y;rainPositions[k+2]=z;rainPositions[k+3]=x-.05;rainPositions[k+4]=y-.24;rainPositions[k+5]=z;}
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x91b6c5,transparent:true,opacity:.25}));scene.add(rain);
+
+// Desk, clutter, ashtray and case evidence.
+box('desk body',0,0.86,-1.35,3.5,.22,1.55,'wood');
+box('desk front',0,.47,-.67,3.5,.65,.13,'wood');
+for(const x of [-1.48,1.48])for(const z of [-1.9,-.82])box('desk leg',x,.39,z,.13,.78,.13,'wood');
+box('desk blotter',0,1.0,-1.35,2.5,.035,1.05,'ink');
+for(let i=0;i<7;i++){const p=box('eviction notice',-1.05+(i%3)*.47,1.045,-1.42+Math.floor(i/3)*.29,.43,.012,.26,i%2?'paper':'paperDark',false);p.rotation.y=(Math.random()-.5)*.24;p.rotation.z=(Math.random()-.5)*.08;}
+const ashtray=cylinder('ashtray',.78,1.08,-1.05,.23,.2,.07,'metal',12);
+for(let i=0;i<5;i++){const a=cylinder('crushed cigarette',.75+(Math.random()-.5)*.22,1.13,-1.05+(Math.random()-.5)*.18,.025,.025,.22,'paper',6,Math.PI/2);a.rotation.z=Math.random()*.3;}
+const bourbon=cylinder('bottle',1.35,1.28,-1.72,.13,.1,.46,'brass',7);cylinder('bottle neck',1.35,1.55,-1.72,.055,.055,.13,'wood',7);
+box('photo',-.55,1.075,-1.18,.34,.015,.25,'paper',false).rotation.y=-.13;
+box('photo image',-.55,1.085,-1.18,.26,.006,.16,'wallDark',false).rotation.y=-.13;
+// Desk lamp.
+cylinder('lamp base',-1.08,1.08,-1.55,.22,.22,.06,'brass',10);
+cylinder('lamp stem',-1.08,1.38,-1.55,.035,.035,.55,'brass',8);
+const shade=new THREE.Mesh(new THREE.ConeGeometry(.27,.25,8,1,true),mats.brass);shade.position.set(-1.08,1.69,-1.55);shade.rotation.x=Math.PI;scene.add(shade);
+box('filing cabinet',-3.45,.72,-2.3,.75,1.45,.85,'wallDark');
+for(let y=.3;y<1.35;y+=.32){box('drawer',-3.45,y,-1.86,.65,.27,.04,'metal');box('drawer handle',-3.45,y,-1.82,.19,.035,.025,'brass');}
+box('bookcase',3.55,1.25,-3.5,.7,2.5,.5,'wood');
+for(let y=.45;y<2.5;y+=.55){box('shelf',3.55,y,-3.5,.72,.06,.54,'woodTop');for(let j=0;j<4;j++)box('book',3.32+j*.13,y+.17,-3.51,.09,.28,.35,['coat','paperDark','metal','woodTop'][j]);}
+// Door and frosted glass sign.
+const door=box('office door',0,1.45,4.78,1.42,2.8,.13,'wood');
+box('frosted glass',0,2.02,4.69,1.18,.64,.025,'glass',false,false);
+box('door sign',0,2.02,4.665,.88,.28,.018,'paperDark',false,false);
+const knob=cylinder('brass knob',.48,1.35,4.64,.07,.07,.08,'brass',8,Math.PI/2);
+for(let i=0;i<3;i++)box('door panel',0,.55+i*.66,4.69,1.03,.49,.025,'woodTop',false);
+
+// Low-poly coat stand and raincoat.
+cylinder('coat stand base',-3.2,.12,.4,.26,.26,.12,'metal',8);
+cylinder('coat stand pole',-3.2,1.1,.4,.045,.045,1.9,'metal',8);
+cylinder('coat stand hook',-3.2,2.08,.4,.045,.045,.55,'metal',8,Math.PI/2);
+const coat=box('hanging coat',-3.12,1.35,.4,.5,.95,.22,'coat');coat.rotation.z=-.07;
+
+// First-person hand, cigarette and match.
+const handGroup=new THREE.Group();camera.add(handGroup);scene.add(camera);
+const hand= new THREE.Mesh(new THREE.BoxGeometry(.22,.17,.32),mats.skin);hand.position.set(.42,-.39,-.62);hand.rotation.x=-.15;handGroup.add(hand);
+const cig= new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.32,6),mats.cig);cig.rotation.z=Math.PI/2;cig.position.set(.31,-.32,-.78);handGroup.add(cig);
+const ember=new THREE.Mesh(new THREE.SphereGeometry(.025,6,5),mats.ember);ember.position.set(.47,-.32,-.78);handGroup.add(ember);
+const emberLight=new THREE.PointLight(0xff642b,0,2);emberLight.position.set(.45,-.3,-.7);camera.add(emberLight);
+handGroup.visible=false;
+
+// Interaction targets.
+const photoTarget=new THREE.Mesh(new THREE.BoxGeometry(.5,.2,.45),new THREE.MeshBasicMaterial({visible:false}));photoTarget.position.set(-.55,1.2,-1.18);scene.add(photoTarget);
+const doorTarget=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.8,.5),new THREE.MeshBasicMaterial({visible:false}));doorTarget.position.set(0,1.45,4.65);scene.add(doorTarget);
+const lampTarget=new THREE.Mesh(new THREE.SphereGeometry(.45),new THREE.MeshBasicMaterial({visible:false}));lampTarget.position.set(-1.08,1.55,-1.55);scene.add(lampTarget);
+const raycaster=new THREE.Raycaster();const center=new THREE.Vector2(0,0);
+const keys={};let started=false,locked=false,smoking=false,dialogueIndex=-1,doorOpened=false,photoRead=false,matchTimer=0,clock=new THREE.Clock(),time=0;
+let yaw=0,pitch=0, bob=0, moving=false, currentTarget=null;
+const story=[
+ {speaker:'COLE (V.O.)',line:'A man can drown in this city without ever touching the bay. All it takes is three missed payments and a badge turned in for scrap.'},
+ {speaker:'COLE',line:'Door’s open. Unless you’re the landlord.'},
+ {speaker:'IRIS VANCE',line:'Detective Cole? They told me at the precinct you don’t take orders from the Commissioner anymore.'},
+ {speaker:'IRIS VANCE',line:'My sister Clara. She hasn’t slept in her bed for three nights. She isn’t in the morgue, and she isn’t in jail.'},
+ {speaker:'COLE',line:'Kids run off every night in the Basin, Miss Vance. Usually chasing a needle or a musician.'},
+ {speaker:'IRIS VANCE',line:'She didn’t run. Men in yellow slickers dragged her into the municipal storm line behind Pier 14. They call themselves the Congregation of the Sinking Sun.'},
+ {speaker:'IRIS VANCE',line:'Find her before midnight strikes. Warehouse 19 gives access to the old sluice gates. Keep your gun loaded, Detective.'}
+];
+function showDialogue(index){dialogueIndex=index;const d=story[index];$('speaker').textContent=d.speaker;$('line').textContent=d.line;$('dialogue').style.display='block';}
+function hideDialogue(){$('dialogue').style.display='none';dialogueIndex=-1;}
+$('continue').addEventListener('click',()=>{if(dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else{hideDialogue();$('objective').textContent='OBJECTIVE: INSPECT THE PHOTOGRAPH';$('chapterText').textContent='The client has left a picture and a key. The story she told you feels rehearsed.';}});
+function updateHint(){raycaster.setFromCamera(center,camera);const hits=raycaster.intersectObjects([photoTarget,doorTarget,lampTarget],false);currentTarget=hits.length?hits[0].object:null;let text='';if(currentTarget===photoTarget)text=photoRead?'PHOTOGRAPH — EXAMINED':'E · EXAMINE PHOTOGRAPH';else if(currentTarget===doorTarget)text=doorOpened?'THE HALL IS DARK':'E · ANSWER THE DOOR';else if(currentTarget===lampTarget)text='A CHEAP DESK LAMP';$('hint').textContent=text;}
+function interact(){if($('dialogue').style.display==='block'){if(dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else{$('dialogue').style.display='none';dialogueIndex=-1;}return;}if(currentTarget===doorTarget){if(!doorOpened){doorOpened=true;door.rotation.y=-.95;door.position.x=-.68;knob.position.x=-.18;$('chapterText').textContent='A soaked woman in a beige trench coat stands in the doorway. She carries a small pigskin satchel.';$('objective').textContent='OBJECTIVE: HEAR IRIS OUT';showDialogue(1);setTimeout(()=>{if(dialogueIndex===1)showDialogue(2)},5000);}else{$('log').textContent='THE HALLWAY DISAPPEARS INTO RAIN AND SHADOW.';}}else if(currentTarget===photoTarget){photoRead=true;$('chapterTitle').textContent='The Photograph';$('chapterText').textContent='A young woman wears an antique silver pendant. On the back: “The deep well is opening. Do not let her call me.”';$('objective').textContent='CLUE RECORDED: THE DEEP WELL';$('log').textContent='CLUE LOG UPDATED — HANDWRITING, PENDANT, A WARNING.';showCustom('COLE','The deep well is opening. Do not let her call me. That’s not a missing-person note. That’s a warning.');}else{$('log').textContent='A tired office. A bad lamp. Rain that won’t let up.';}}
+function showCustom(speaker,line){$('speaker').textContent=speaker;$('line').textContent=line;$('dialogue').style.display='block';dialogueIndex=story.length-1;}
+function toggleSmoke(){smoking=!smoking;matchTimer=smoking?10:0;handGroup.visible=smoking;$('smokeValue').textContent=smoking?'LIT · 10 SEC':'UNLIT';$('smokeBtn').textContent=smoking?'F · EXTINGUISH':'F · LIGHT MATCH';emberLight.intensity=smoking?2.2:0;if(smoking){$('log').textContent='A match flares. For a moment, the room holds still.';playMatch();}else{$('log').textContent='The ember dies. The rain fills the silence.';}}
+let audioCtx=null,master=null,ambientStarted=false;
+function startAudio(){if(ambientStarted)return;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();master=audioCtx.createGain();master.gain.value=.16;master.connect(audioCtx.destination);const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.15;const noise=audioCtx.createBufferSource();noise.buffer=buffer;noise.loop=true;const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=480;const g=audioCtx.createGain();g.gain.value=.17;noise.connect(filter);filter.connect(g);g.connect(master);noise.start();const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=48;const og=audioCtx.createGain();og.gain.value=.08;osc.connect(og);og.connect(master);osc.start();ambientStarted=true;}catch(e){}}
+function playMatch(){if(!audioCtx)return;const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(1500,t);osc.frequency.exponentialRampToValueAtTime(180,t+.12);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);osc.connect(g);g.connect(master);osc.start(t);osc.stop(t+.18);}
+function unlock(){if(!started)return;renderer.domElement.requestPointerLock?.();}
+renderer.domElement.addEventListener('click',()=>{if(started&&$('dialogue').style.display!=='block')unlock();});
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement;});
+document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=THREE.MathUtils.clamp(pitch,-1.2,1.15);});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='KeyF'&&!e.repeat)toggleSmoke();if(e.code==='Enter'&&$('dialogue').style.display==='block')$('continue').click();if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+$('smokeBtn').addEventListener('click',toggleSmoke);$('inspectBtn').addEventListener('click',interact);
+$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;startAudio();showDialogue(0);setTimeout(()=>{if(dialogueIndex===0)showDialogue(1)},5500);});
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+const clampRoom=()=>{camera.position.x=THREE.MathUtils.clamp(camera.position.x,-4.05,4.05);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-4.45,4.45);camera.position.y=1.65;};
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);time+=dt;
+  rainGeo.attributes.position.array.forEach((v,i)=>{if(i%6===1||i%6===4){rainGeo.attributes.position.array[i]-=dt*5;if(rainGeo.attributes.position.array[i]<-1)rainGeo.attributes.position.array[i]=8;}});
+  rainGeo.attributes.position.needsUpdate=true;
+  ceilingLamp.intensity=17+Math.sin(time*2.1)*.7+(Math.random()<.008?-6:0);
+  windowLight.intensity=9+Math.sin(time*3.3)*1.3;
+  if(started){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
+    const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let dx=0,dz=0;
+    if(keys.KeyW||keys.ArrowUp){dx+=forward.x;dz+=forward.z;}if(keys.KeyS||keys.ArrowDown){dx-=forward.x;dz-=forward.z;}if(keys.KeyA){dx-=right.x;dz-=right.z;}if(keys.KeyD){dx+=right.x;dz+=right.z;}
+    moving=dx!==0||dz!==0;if(moving){const l=Math.hypot(dx,dz)||1;camera.position.x+=dx/l*dt*2.1;camera.position.z+=dz/l*dt*2.1;bob+=dt*9;}clampRoom();camera.position.y=1.65+(moving?Math.sin(bob)*.018:Math.sin(time*1.2)*.006);
+    handGroup.position.y=smoking?Math.sin(time*2)*.006:0;
+    if(smoking){matchTimer-=dt;$('smokeValue').textContent='LIT · '+Math.max(0,Math.ceil(matchTimer))+' SEC';emberLight.intensity=1.8+Math.sin(time*18)*.5;if(matchTimer<=0){smoking=false;handGroup.visible=false;emberLight.intensity=0;$('smokeValue').textContent='UNLIT';$('smokeBtn').textContent='F · LIGHT MATCH';}}
+    updateHint();
+  }
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
