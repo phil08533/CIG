@@ -159,7 +159,7 @@ const emberLight=new THREE.PointLight(0xff642b,0,2);emberLight.position.set(.45,
 handGroup.visible=false;
 
 // Low-poly characters: Iris Vance in a rain-darkened coat and a lurking Basin watcher.
-function addCharacterPart(group,geometry,color,pos,scale,rotation={x:0,y:0,z:0}){const m=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(...pos);m.scale.set(...scale);m.rotation.set(rotation.x,rotation.y,rotation.z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
+function addCharacterPart(group,geometry,color,pos,scale=[1,1,1],rotation={x:0,y:0,z:0}){const m=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(...pos);m.scale.set(...scale);m.rotation.set(rotation.x,rotation.y,rotation.z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
 function makeIris(){const g=new THREE.Group();
  addCharacterPart(g,new THREE.CylinderGeometry(.19,.28,.92,6),0x344b53,[0,1.05,0],[1,1,1],{z:-.035});
  addCharacterPart(g,new THREE.BoxGeometry(.48,.48,.16),0x526a68,[0,1.16,.015],[1,1,1],{z:-.04});
