@@ -46,11 +46,11 @@ canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
   <section id="chapter"><div class="kicker">ACT I · THE OFFICE OF LOST SOULS</div><h2 id="chapterTitle">The Retainer</h2><p id="chapterText">Midnight. A storm works the windows like a debt collector. Someone is waiting outside your office.</p><div id="objective" class="kicker" style="margin-top:10px;margin-bottom:0">OBJECTIVE: ANSWER THE DOOR</div></section>
   <div id="crosshair"></div><div id="hint"></div><div id="smoke">SMOKE METER<b id="smokeValue">STEADY</b></div>
   <div id="bottom"><div id="log">WASD MOVE · MOUSE LOOK · E INTERACT · F LIGHT CIGARETTE · ESC RELEASE MOUSE</div><div id="actions"><button id="smokeBtn">F · LIGHT MATCH</button><button id="inspectBtn">E · INSPECT</button></div></div>
-  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button></div>
+  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button><div id="endingChoices" style="display:none;clear:both;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:14px"><button id="sealEnding">SEAL THE GATE</button><button id="openEnding">OPEN THE GATE</button></div></div>
 </div>
 <div id="fade"></div>
 <div id="touchControls" aria-label="Touch game controls"><div id="movePad"><div class="touchKey" id="keyW" data-key="KeyW">▲</div><div class="touchKey" id="keyA" data-key="KeyA">◀</div><div class="touchKey" id="keyS" data-key="KeyS">▼</div><div class="touchKey" id="keyD" data-key="KeyD">▶</div></div><div id="touchActions"><div class="touchKey" id="touchInteract">INTERACT</div><div class="touchKey" id="touchSmoke">MATCH</div></div><div id="lookLabel">DRAG RIGHT SIDE TO LOOK</div></div>
-<div id="overlay"><div id="card"><div class="eyebrow">A CIG INTERACTIVE STORY</div><h1>ASH <span>&</span><br>EMBERS</h1><h2>A DETECTIVE STORY IN THE FLOODED BASIN</h2><p>A city can drown a man without ever touching the bay. Tonight, someone has brought you a photograph, an iron key, and a story that doesn't quite add up.</p><p>Explore Cole's office. Find the details worth noticing. Meet Iris Vance. This is an early playable prototype: the atmosphere and interactions are being built before the full case.</p><button id="start">ENTER THE OFFICE</button><div class="small">WASD TO MOVE · MOUSE TO LOOK · E TO INTERACT · F TO LIGHT A MATCH<br>HEADPHONES RECOMMENDED · AUDIO STARTS AFTER YOU ENTER</div></div></div>
+<div id="overlay"><div id="card"><div class="eyebrow">A CIG INTERACTIVE STORY</div><h1>ASH <span>&</span><br>EMBERS</h1><h2>A DETECTIVE STORY IN THE FLOODED BASIN</h2><p>A city can drown a man without ever touching the bay. Tonight, someone has brought you a photograph, an iron key, and a story that doesn't quite add up.</p><p>Explore Cole’s office, follow the red lamps to Pier 14, search Warehouse 19, and descend into the drainage cathedral beneath the city. Meet Iris and Clara Vance, the Harbor Warden, and the thing that learned to speak with the dead. Your final choice will decide what the Basin remembers.</p><button id="start">ENTER THE OFFICE</button><div class="small">WASD TO MOVE · MOUSE TO LOOK · E TO INTERACT · F TO LIGHT A MATCH<br>FOUR CHAPTERS · TWO ENDINGS · AUDIO STARTS AFTER YOU ENTER</div></div></div>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"}}
 </script>
@@ -60,32 +60,32 @@ import * as THREE from 'three';
 const $ = id => document.getElementById(id);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x090d12);
-scene.fog = new THREE.FogExp2(0x090d12, 0.078);
+scene.fog = new THREE.FogExp2(0x101725, 0.061);
 const camera = new THREE.PerspectiveCamera(66, innerWidth/innerHeight, 0.08, 65);
 camera.position.set(0,1.65,4.6);
 const renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance'});
 // Intentionally render at a small internal resolution for a late-PS1 look.
-const ps1Scale = 0.58;
+const ps1Scale = 0.52;
 function resizePS1(){renderer.setPixelRatio(1);renderer.setSize(Math.max(320,Math.floor(innerWidth*ps1Scale)),Math.max(200,Math.floor(innerHeight*ps1Scale)),false);renderer.domElement.style.width='100vw';renderer.domElement.style.height='100dvh';}
 resizePS1();
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.78;
+renderer.toneMappingExposure = 1.02;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const mats = {};
 function mat(name,color,roughness=1,opts={}){return mats[name]=new THREE.MeshStandardMaterial({color,roughness,...opts});}
-mat('wall',0x343435);mat('wallDark',0x171a1c);mat('floor',0x292522);mat('wood',0x39271c);mat('woodTop',0x4a3424);mat('metal',0x353c40,.65,{metalness:.65});mat('brass',0x957044,.45,{metalness:.65});mat('paper',0xb7a887);mat('paperDark',0x82745e);mat('glass',0x18252a,.2,{metalness:.3});mat('coat',0x4b4b3d);mat('skin',0x9b7561);mat('ink',0x29221c);mat('cig',0xbcb5a5);mat('ember',0xff5d16,.45,{emissive:0xff3200,emissiveIntensity:2});
+mat('wall',0x41485f);mat('wallDark',0x171b2b);mat('floor',0x352d3a);mat('wood',0x563022);mat('woodTop',0x75452a);mat('metal',0x3d5366,.65,{metalness:.65});mat('brass',0xc18a3f,.45,{metalness:.65});mat('paper',0xd8c39a);mat('paperDark',0x9a7654);mat('glass',0x1b3b50,.2,{metalness:.3});mat('coat',0x4c6557);mat('skin',0xc18a70);mat('ink',0x292637);mat('cig',0xe1d8c3);mat('ember',0xff5d16,.45,{emissive:0xff3200,emissiveIntensity:3.2});
 function box(name,x,y,z,sx,sy,sz,material,cast=true,receive=true){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),typeof material==='string'?mats[material]:material);o.name=name;o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=receive;scene.add(o);return o;}
 function cylinder(name,x,y,z,r1,r2,h,material,seg=8,rotX=0){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,seg),mats[material]);o.name=name;o.position.set(x,y,z);o.rotation.x=rotX;o.castShadow=true;scene.add(o);return o;}
 function addLight(color,intensity,pos,dist=12){const l=new THREE.PointLight(color,intensity,dist,2);l.position.set(...pos);scene.add(l);return l;}
 
-scene.add(new THREE.HemisphereLight(0x697582,0x100b09,0.48));
-const ceilingLamp=addLight(0xffb96d,8,[0,3.1,-0.2],7);
-const deskLamp=addLight(0xff9b42,13,[-1.05,2.1,-.5],3.8);
-const windowLight=addLight(0x42667a,4,[0,2.4,-4.6],6);
+scene.add(new THREE.HemisphereLight(0x879ac7,0x21101a,0.72));
+const ceilingLamp=addLight(0xffb45e,11,[0,3.1,-0.2],7.5);
+const deskLamp=addLight(0xff8c32,22,[-1.05,2.1,-.5],4.2);
+const windowLight=addLight(0x3f91c2,7,[0,2.4,-4.6],7);
 
 // Small, oppressive office.
 box('floor',0,-.13,0,9,.25,10,'floor');
@@ -105,12 +105,12 @@ for(const x of [-1.53,0,1.53]) box('window mullion',x,2.15,-4.65,.06,1.68,.09,'w
 box('window crossbar',0,2.15,-4.64,3.0,.055,.09,'wood');
 box('window sill',0,1.28,-4.55,3.25,.12,.3,'woodTop');
 const city=new THREE.Group();scene.add(city);
-for(let i=0;i<24;i++){const x=(Math.random()-.5)*22,z=-8-Math.random()*8,h=.5+Math.random()*4;const b=new THREE.Mesh(new THREE.BoxGeometry(.45+Math.random()*.9,h,.45),new THREE.MeshStandardMaterial({color:0x101b24,roughness:1}));b.position.set(x,h/2-0.1,z);city.add(b);for(let j=0;j<4;j++){const w=new THREE.Mesh(new THREE.BoxGeometry(.04,.05,.01),new THREE.MeshBasicMaterial({color:Math.random()>.5?0xb17848:0x4e7387}));w.position.set(x+(Math.random()-.5)*.5,Math.random()*h,z+.23);city.add(w)}}
+for(let i=0;i<24;i++){const x=(Math.random()-.5)*22,z=-8-Math.random()*8,h=.5+Math.random()*4;const b=new THREE.Mesh(new THREE.BoxGeometry(.45+Math.random()*.9,h,.45),new THREE.MeshStandardMaterial({color:0x142a42,roughness:1}));b.position.set(x,h/2-0.1,z);city.add(b);for(let j=0;j<4;j++){const w=new THREE.Mesh(new THREE.BoxGeometry(.04,.05,.01),new THREE.MeshBasicMaterial({color:Math.random()>.5?0xb17848:0x4e7387}));w.position.set(x+(Math.random()-.5)*.5,Math.random()*h,z+.23);city.add(w)}}
 
 // Rain streaks outside the glass.
 const rainGeo=new THREE.BufferGeometry();const rainCount=650;const rainPositions=new Float32Array(rainCount*6);
 for(let i=0;i<rainCount;i++){const x=(Math.random()-.5)*15,y=Math.random()*9,z=-4.2-Math.random()*9;const k=i*6;rainPositions[k]=x;rainPositions[k+1]=y;rainPositions[k+2]=z;rainPositions[k+3]=x-.05;rainPositions[k+4]=y-.24;rainPositions[k+5]=z;}
-rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x91b6c5,transparent:true,opacity:.25}));scene.add(rain);
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x67bce8,transparent:true,opacity:.42}));scene.add(rain);
 
 // Desk, clutter, ashtray and case evidence.
 box('desk body',0,0.86,-1.35,3.5,.22,1.55,'wood');
@@ -147,10 +147,174 @@ const coat=box('hanging coat',-3.12,1.35,.4,.5,.95,.22,'coat');coat.rotation.z=-
 // First-person hand, cigarette and match.
 const handGroup=new THREE.Group();camera.add(handGroup);scene.add(camera);
 const hand= new THREE.Mesh(new THREE.BoxGeometry(.22,.17,.32),mats.skin);hand.position.set(.42,-.39,-.62);hand.rotation.x=-.15;handGroup.add(hand);
-const cig= new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.32,6),mats.cig);cig.rotation.z=Math.PI/2;cig.position.set(.31,-.32,-.78);handGroup.add(cig);
+const cig= new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.32,6),mats.cig);
+// CylinderGeometry runs along local Y. Rotate -90 degrees so its positive end points toward screen-right, where the ember sits.
+cig.rotation.z=-Math.PI/2;cig.position.set(.31,-.32,-.78);handGroup.add(cig);
 const ember=new THREE.Mesh(new THREE.SphereGeometry(.025,6,5),mats.ember);ember.position.set(.47,-.32,-.78);handGroup.add(ember);
+const cigBand=new THREE.Mesh(new THREE.CylinderGeometry(.019,.019,.035,6),new THREE.MeshStandardMaterial({color:0x9b5a35,roughness:1}));cigBand.rotation.z=-Math.PI/2;cigBand.position.set(.18,-.32,-.78);handGroup.add(cigBand);
+// Individual cigarette smoke puffs are parented to the cigarette hand, so they follow the ember in first person.
+const cigSmoke=[];const cigSmokeMat=new THREE.MeshBasicMaterial({color:0xc7d4df,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
+for(let i=0;i<9;i++){const puff=new THREE.Mesh(new THREE.PlaneGeometry(.09,.12),cigSmokeMat.clone());puff.position.set(.48,-.27,-.78);puff.visible=false;handGroup.add(puff);cigSmoke.push({mesh:puff,life:Math.random(),seed:Math.random()*8});}
 const emberLight=new THREE.PointLight(0xff642b,0,2);emberLight.position.set(.45,-.3,-.7);camera.add(emberLight);
 handGroup.visible=false;
+
+// Low-poly characters: Iris Vance in a rain-darkened coat and a lurking Basin watcher.
+function addCharacterPart(group,geometry,color,pos,scale,rotation={x:0,y:0,z:0}){const m=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(...pos);m.scale.set(...scale);m.rotation.set(rotation.x,rotation.y,rotation.z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
+function makeIris(){const g=new THREE.Group();
+ addCharacterPart(g,new THREE.CylinderGeometry(.19,.28,.92,6),0x344b53,[0,1.05,0],[1,1,1],{z:-.035});
+ addCharacterPart(g,new THREE.BoxGeometry(.48,.48,.16),0x526a68,[0,1.16,.015],[1,1,1],{z:-.04});
+ addCharacterPart(g,new THREE.SphereGeometry(.22,7,6),0xc48c70,[0,1.78,0],[.82,1.05,.8]);
+ addCharacterPart(g,new THREE.SphereGeometry(.235,7,5),0x29232b,[0,1.91,-.015],[1.03,.72,.95]);
+ addCharacterPart(g,new THREE.BoxGeometry(.1,.52,.13),0x29232b,[-.19,1.64,-.005],[1,1,1],{z:-.12});
+ addCharacterPart(g,new THREE.BoxGeometry(.1,.52,.13),0x29232b,[.19,1.64,-.005],[1,1,1],{z:.12});
+ addCharacterPart(g,new THREE.SphereGeometry(.035,5,4),0x202d3b,[-.075,1.79,.17],[1,1,.55]);
+ addCharacterPart(g,new THREE.SphereGeometry(.035,5,4),0x202d3b,[.075,1.79,.17],[1,1,.55]);
+ addCharacterPart(g,new THREE.BoxGeometry(.1,.62,.12),0x344b53,[-.28,1.08,0],[1,1,1],{z:-.12});addCharacterPart(g,new THREE.BoxGeometry(.1,.62,.12),0x344b53,[.28,1.08,0],[1,1,1],{z:.12});
+ addCharacterPart(g,new THREE.BoxGeometry(.17,.56,.19),0x262b36,[-.12,.31,0],[1,1,1]);addCharacterPart(g,new THREE.BoxGeometry(.17,.56,.19),0x262b36,[.12,.31,0],[1,1,1]);
+ // A little satchel catches the amber light.
+ addCharacterPart(g,new THREE.BoxGeometry(.25,.25,.12),0x8a5833,[.33,.88,.08],[1,1,1],{z:-.12});g.position.set(0,0,3.65);g.visible=false;scene.add(g);return g;}
+const iris=makeIris();
+function makeWatcher(){const g=new THREE.Group();addCharacterPart(g,new THREE.ConeGeometry(.48,1.35,5),0x343b42,[0,1.15,0]);addCharacterPart(g,new THREE.SphereGeometry(.22,6,5),0x1a2029,[0,1.95,0],[.9,1,.8]);addCharacterPart(g,new THREE.BoxGeometry(.08,.07,.035),0xffaa37,[-.07,1.98,.18],[1,1,1]);addCharacterPart(g,new THREE.BoxGeometry(.08,.07,.035),0xffaa37,[.07,1.98,.18],[1,1,1]);g.position.set(1.6,0,-4.2);g.visible=false;scene.add(g);return g;}
+const watcher=makeWatcher();
+function makeClara(){const g=new THREE.Group();addCharacterPart(g,new THREE.ConeGeometry(.31,.9,6),0x8b394a,[0,.83,0]);addCharacterPart(g,new THREE.SphereGeometry(.18,7,6),0xc99a83,[0,1.53,0],[.86,1,.8]);addCharacterPart(g,new THREE.SphereGeometry(.19,7,5),0x251c2b,[0,1.65,-.015],[1.05,.72,.95]);addCharacterPart(g,new THREE.BoxGeometry(.07,.4,.1),0x251c2b,[-.15,1.4,-.005],[1,1,1],{z:-.15});addCharacterPart(g,new THREE.BoxGeometry(.07,.4,.1),0x251c2b,[.15,1.4,-.005],[1,1,1],{z:.15});addCharacterPart(g,new THREE.SphereGeometry(.055,5,4),0xd8b35a,[0,1.1,.15],[1,1,.65]);g.position.set(0,.05,-4.15);g.visible=false;scene.add(g);return g;}
+
+const clara=makeClara();
+
+// Full playable follow-up chapters. Each chapter is built from low-poly Three.js
+// geometry and placed in its own district of the same world.
+let currentLevel=0;
+const levelGroups=[];
+function levelBox(g,name,x,y,z,sx,sy,sz,color,opts={}){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true,...opts}));m.name=name;m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;}
+function levelCylinder(g,x,y,z,r1,r2,h,color,segments=7){const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(x,y,z);m.castShadow=true;g.add(m);return m;}
+function levelCharacter(g,x,y,z,kind='worker'){
+ const c=new THREE.Group(), coat=kind==='warden'?0x5a3c31:kind==='clara'?0x8e334c:0x354b52;
+ addCharacterPart(c,new THREE.CylinderGeometry(.18,.27,.9,6),coat,[0,.95,0]);
+ addCharacterPart(c,new THREE.SphereGeometry(.2,7,6),kind==='clara'?0xb88976:0xb27e64,[0,1.63,0],[.85,1,.8]);
+ addCharacterPart(c,new THREE.SphereGeometry(.22,7,5),kind==='clara'?0x251a2b:0x25232a,[0,1.76,-.02],[1.04,.72,.92]);
+ addCharacterPart(c,new THREE.BoxGeometry(.09,.48,.12),coat,[-.24,.96,0],[1,1,1],{z:-.1});
+ addCharacterPart(c,new THREE.BoxGeometry(.09,.48,.12),coat,[.24,.96,0],[1,1,1],{z:.1});
+ if(kind==='warden'){addCharacterPart(c,new THREE.ConeGeometry(.23,.28,5),0x26252b,[0,1.91,0]);addCharacterPart(c,new THREE.BoxGeometry(.12,.045,.04),0xe0a447,[-.06,1.65,.16]);}
+ c.position.set(x,y,z);g.add(c);return c;
+}
+function buildDockLevel(){
+ const g=new THREE.Group();g.position.x=20;scene.add(g);levelGroups.push(g);
+ const wood=0x5b3b31,wet=0x273b49,metal=0x52616a;
+ levelBox(g,'pier water',0,-.7,-7,18,.2,22,0x102b42);
+ levelBox(g,'pier deck',0,-.05,-2,7,.25,13,wood);
+ for(let x=-3;x<=3;x+=1.5)for(let z=-7;z<=3;z+=2.4)levelCylinder(g,x,-.75,z,.15,.22,1.6,0x302b31,5);
+ for(const x of [-3.35,3.35]){levelBox(g,'dock rail',x,.45,-2,.12,.12,11,metal);for(let z=-7;z<=3;z+=1.5)levelBox(g,'rail post',x,.2,z,.12,.8,.12,wood);}
+ for(let i=0;i<7;i++){const b=levelBox(g,'warehouse silhouettes',-8+i*2.5,1.1,-11,1.4,2.4,.8,i%2?0x263342:0x3b2d36);levelBox(g,'lit windows',-8+i*2.5,1.2,-10.55,.2,.35,.04,i%3?0x9a623e:0x39758b,{emissive:i%3?0x6e2c13:0x16394d,emissiveIntensity:.7});}
+ for(const z of [-6,-1,4]){levelCylinder(g,-2.5,.9,z,.07,.07,1.8,0x41454b);const bulb=new THREE.Mesh(new THREE.SphereGeometry(.13,6,5),new THREE.MeshBasicMaterial({color:0xffa34f}));bulb.position.set(-2.5,1.78,z);g.add(bulb);const l=new THREE.PointLight(0xff843b,3,5);l.position.set(-2.5,1.7,z);g.add(l);}
+ levelCharacter(g,1.7,0,-2,'warden');
+ const crate=levelBox(g,'pier crate',1.8,.35,-5,.9,.7,.8,0x55402f);crate.rotation.y=.3;
+ return g;
+}
+function buildWarehouseLevel(){
+ const g=new THREE.Group();g.position.x=40;scene.add(g);levelGroups.push(g);
+ levelBox(g,'warehouse floor',0,-.18,-3,15,.3,18,0x3d3539);
+ levelBox(g,'warehouse rear wall',0,3,-12,15,6,.3,0x343844);
+ for(const x of [-7.3,7.3])levelBox(g,'warehouse side wall',x,3,-3,.3,6,18,0x272e3b);
+ levelBox(g,'warehouse roof',0,6,-3,15,.25,18,0x202632);
+ for(let x=-6;x<=6;x+=3){levelBox(g,'iron beam',x,4.8,-3,.16,.2,18,0x5a4c4a);levelBox(g,'hanging chain',x,3.5,-4,.035,2.5,.035,0x899098);}
+ for(let i=0;i<9;i++){const x=-5.8+(i%3)*2.3,z=-8+Math.floor(i/3)*2.5;levelBox(g,'cargo crate',x,.75,z,1.6,1.5,1.5,[0x61412f,0x3b4a4e,0x684b38][i%3]);for(const y of [.25,1.15])levelBox(g,'crate band',x,y,z+.76,1.62,.07,.04,0x8c6b42);}
+ // A huge iron hatch, the route beneath the warehouse.
+ levelCylinder(g,0,.03,-9.1,1.5,1.5,.12,0x242b32,12);
+ for(let i=0;i<8;i++){const a=i*Math.PI/4;levelBox(g,'hatch spokes',Math.cos(a)*.8,.12,-9.1+Math.sin(a)*.8,1.55,.06,.08,0x65717a).rotation.y=-a;}
+ const hangingLamp=new THREE.PointLight(0xff6b39,5,9);hangingLamp.position.set(0,4.2,-3);g.add(hangingLamp);
+ levelCharacter(g,-2,0,-6,'clara');
+ levelCharacter(g,3,0,-9,'warden');
+ return g;
+}
+function buildCathedralLevel(){
+ const g=new THREE.Group();g.position.x=60;scene.add(g);levelGroups.push(g);
+ levelBox(g,'flooded cathedral water',0,-.42,-4,16,.12,20,0x153c51,{metalness:.2,roughness:.25});
+ for(const x of [-6,-3,0,3,6]){levelCylinder(g,x,2.3,-4,.18,.3,4.6,0x55515a,5);levelCylinder(g,x,4.7,-4,.27,.27,.12,0x88705a,6);}
+ for(const z of [-11,-7,-3,1,5]){levelBox(g,'cathedral arch beam',0,4.5,z,13,.22,.25,0x5b4c4b);for(const x of [-6,6])levelBox(g,'arch foot',x,2,z,.42,4,.45,0x373744);}
+ // Red candles and a sunken altar.
+ levelBox(g,'black altar',0,.65,-7,3,.9,1.3,0x2b252d);
+ levelBox(g,'altar top',0,1.13,-7,3.3,.12,1.5,0x6a3c3e);
+ for(const x of [-1,0,1]){levelCylinder(g,x,1.45,-7,.07,.07,.55,0xc6a36c);const flame=new THREE.Mesh(new THREE.ConeGeometry(.08,.2,5),new THREE.MeshBasicMaterial({color:0xff3d28}));flame.position.set(x,1.82,-7);g.add(flame);const l=new THREE.PointLight(0xff3228,1.6,3);l.position.set(x,1.8,-7);g.add(l);}
+ for(let i=0;i<12;i++){const a=i*Math.PI/6;levelCylinder(g,Math.cos(a)*2.4,.03,-7+Math.sin(a)*2.4,.06,.06,.03,0xb44345,5);}
+ levelCharacter(g,0,0,-9,'clara');
+ const watcherModel=makeWatcher();watcherModel.position.set(2,0,-10);watcherModel.visible=true;g.add(watcherModel);watcherModel.position.x=2;
+ return g;
+}
+buildDockLevel();buildWarehouseLevel();buildCathedralLevel();
+const dockTarget=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.MeshBasicMaterial({visible:false}));dockTarget.position.set(20,1,-3);scene.add(dockTarget);
+const dockExitTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2),new THREE.MeshBasicMaterial({visible:false}));dockExitTarget.position.set(20,1,-8.6);scene.add(dockExitTarget);
+const warehouseTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2.5),new THREE.MeshBasicMaterial({visible:false}));warehouseTarget.position.set(40,1.2,-5);scene.add(warehouseTarget);
+const hatchTarget=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,.4,10),new THREE.MeshBasicMaterial({visible:false}));hatchTarget.position.set(40,.1,-9.1);scene.add(hatchTarget);
+const altarTarget=new THREE.Mesh(new THREE.BoxGeometry(3,2,2),new THREE.MeshBasicMaterial({visible:false}));altarTarget.position.set(60,1,-7);scene.add(altarTarget);
+const levelExitTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2),new THREE.MeshBasicMaterial({visible:false}));levelExitTarget.position.set(60,1,-11);scene.add(levelExitTarget);
+const levelStory={
+ 1:[
+  ['COLE (V.O.)','Pier 14. The city ends here, or pretends to. Beyond the pilings, the bay keeps every secret it is paid to keep.'],
+  ['HARBOR WARDEN','You’re late. The tide’s been coming in for an hour, and the sirens started before the rain.'],
+  ['COLE','You always greet strangers with a weather report?'],
+  ['HARBOR WARDEN','Only the ones carrying a dead man’s name. Rook used to stand right there. Said the water had a memory. Then he went under in a dry room.'],
+  ['COLE','Where’s Warehouse 19?'],
+  ['HARBOR WARDEN','Follow the red lamps. If you hear someone you love calling from the water, don’t answer. It learns your voice.'],
+  ['COLE (V.O.)','The red lamps led north. So did the smell of hot copper, wet rope, and something sweet rotting below the boards.']
+ ],
+ 2:[
+  ['COLE (V.O.)','Warehouse 19 had been condemned twice, insured three times, and emptied on paper every winter for twelve years. The paper had never been inside.'],
+  ['CLARA?','Iris? Is that you? Please, I can’t see the door.'],
+  ['COLE','Clara Vance? Stay where you are.'],
+  ['CLARA?','He says the city is only a lid. He says everyone who drowned is still down there, waiting for the lid to lift.'],
+  ['COLE','Who is “he”?'],
+  ['THE WARDEN','Don’t touch the hatch. The Congregation feeds it names. A name is a hook. A memory is the line.'],
+  ['COLE (V.O.)','Under the crates I found a municipal seal, a rusted key, and a list of names. Clara’s was last. Mine was already written beneath it.'],
+  ['COLE','If this is a trap, it’s an expensive one.'],
+  ['CLARA?','Detective, the voice below has your face.']
+ ],
+ 3:[
+  ['COLE (V.O.)','The old drainage cathedral was built before the city had a name. Every flood-control map called it a culvert. Every map was a lie.'],
+  ['CLARA VANCE','Iris sent you. I knew she would. She never could leave a locked door alone.'],
+  ['COLE','You’re alive.'],
+  ['CLARA VANCE','Part of me. The rest is in the water, where they put all the things they didn’t want to bury. Rook opened the first gate. Vale ordered it sealed. The flood took the workers anyway.'],
+  ['COLE','And the Congregation?'],
+  ['CLARA VANCE','They think the dead can be brought back if enough living people remember them. They’re right about the remembering. Wrong about what answers.'],
+  ['THE WATCHER','Give us the name you miss most. We will give you the voice back.'],
+  ['COLE','I don’t bargain with things that hide in drains.'],
+  ['CLARA VANCE','You already have. Every night you come here in your dreams. The final gate needs a choice, Cole. Not a key.']
+ ]
+};
+let levelSequence=null,levelSequenceIndex=0,levelVisited={1:false,2:false,3:false},warehouseInspected=false,finalChoiceShown=false,endingChoiceActive=false;
+function showLevelSequence(lines){levelSequence=lines;levelSequenceIndex=0;renderLevelLine();}
+function renderLevelLine(){const d=levelSequence[levelSequenceIndex];$('speaker').textContent=d[0];$('line').textContent=d[1];$('dialogue').style.display='block';if(d[0]==='THE WATCHER'){watcher.visible=true;}}
+function advanceDialogue(){if(endingChoiceActive)return;if(levelSequence){levelSequenceIndex++;if(levelSequenceIndex<levelSequence.length){renderLevelLine();return;}levelSequence=null;hideDialogue();return;}if(dialogueIndex>=0&&dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else finishConversation();}
+function setLevel(n){currentLevel=n;levelGroups.forEach((g,i)=>g.visible=(i===n-1));camera.position.set(n*20,1.65,n===1?3.5:n===2?3.5:3.5);yaw=0;pitch=0;camera.rotation.set(0,0,0);keys.KeyW=keys.KeyA=keys.KeyS=keys.KeyD=false;iris.visible=false;clara.visible=false;watcher.visible=false;deskLamp.intensity=n===0?deskLamp.intensity:0;scene.fog.color.set(n===1?0x102334:n===2?0x171923:0x160f1c);scene.fog.density=n===1?.045:n===2?.052:.06;$('fade').style.opacity='0';$('dialogue').style.display='none';$('chapterTitle').textContent=n===1?'Pier 14':n===2?'Warehouse 19':'The Drainage Cathedral';$('chapter').querySelector('.kicker').textContent=n===1?'ACT II · THE RED LAMPS':n===2?'ACT III · THE CITY UNDER THE CITY':'ACT IV · THE DEEP WELL';$('chapterText').textContent=n===1?'Rain runs uphill along the pier. Red lamps mark a route no city map admits exists.':n===2?'The warehouse is full of things the city claims it destroyed. Something below is speaking in familiar voices.':'Beneath the Basin, the drowned city gathers around a gate older than its streets.';$('objective').textContent=n===1?'OBJECTIVE: FIND WAREHOUSE 19':n===2?'OBJECTIVE: FIND THE HATCH':'OBJECTIVE: SPEAK TO CLARA';$('log').textContent=n===1?'NEW LOCATION — PIER 14':n===2?'NEW LOCATION — WAREHOUSE 19':'NEW LOCATION — DRAINAGE CATHEDRAL';}
+
+function showEndingPrompt(){
+ levelSequence=null;dialogueIndex=-1;endingChoiceActive=true;
+ $('speaker').textContent='THE DEEP WELL';
+ $('line').textContent='COLE. We kept a place for you. We kept every name you tried to forget. Seal the gate and let the dead be dead, or open it and let the city remember everything.';
+ $('dialogue').style.display='block';$('continue').style.display='none';$('endingChoices').style.display='flex';
+ $('objective').textContent='FINAL CHOICE: SEAL THE GATE OR OPEN IT';
+}
+function finishEnding(seal){
+ endingChoiceActive=false;$('endingChoices').style.display='none';$('continue').style.display='';
+ $('fade').style.opacity='1';
+ setTimeout(()=>{
+  if(seal){$('chapterTitle').textContent='The Quiet Below';$('chapterText').textContent='The gate seals. The voices stop. At dawn, Cole walks back into the rain carrying no proof, only the silence he chose.';$('log').textContent='ENDING UNLOCKED — THE QUIET BELOW';}
+  else{$('chapterTitle').textContent='The City Remembers';$('chapterText').textContent='The gate opens. Across the Basin, every drowned voice rises from the drains. Somewhere above, a child laughs in the rain.';$('log').textContent='ENDING UNLOCKED — THE CITY REMEMBERS';}
+  $('objective').textContent='CASE FILE 001 — END';$('dialogue').style.display='none';$('fade').style.opacity='0';finalChoiceShown=false;
+  $('chapter').querySelector('.kicker').textContent=seal?'ENDING A · THE QUIET BELOW':'ENDING B · THE CITY REMEMBERS';
+  $('line').textContent=seal?'The silence follows you home.':'Every drain in the Basin begins to sing.';
+ },800);
+}
+$('sealEnding').addEventListener('click',()=>finishEnding(true));
+$('openEnding').addEventListener('click',()=>finishEnding(false));
+
+function interactLevel(){if(currentLevel===1&&currentTarget===dockExitTarget){$('fade').style.opacity='1';setTimeout(()=>{setLevel(2);showLevelSequence([['COLE (V.O.)','Warehouse 19 stood at the end of the pier like a missing tooth. The lock had been cut from the outside.'],['COLE','Someone wanted this place opened. They just didn’t want to be here when it happened.']]);},650);}
+ else if(currentLevel===1&&currentTarget===dockTarget){if(!levelVisited[1]){levelVisited[1]=true;showLevelSequence(levelStory[1]);}else{$('log').textContent='The harbor warden will not meet your eyes. The red lamps point north.';}}
+ else if(currentLevel===2&&currentTarget===warehouseTarget){if(!levelVisited[2]){levelVisited[2]=true;showLevelSequence(levelStory[2]);}else{$('log').textContent='The list of names lies where you left it. Your own name is still wet.';}}
+ else if(currentLevel===2&&currentTarget===hatchTarget){if(!warehouseInspected){warehouseInspected=true;$('objective').textContent='OBJECTIVE: DESCEND TO THE DRAINAGE CATHEDRAL';$('log').textContent='CLUE: MUNICIPAL SEAL · THE HATCH IS UNLOCKED';showLevelSequence([['COLE','The key fits. Of course it fits. Someone wanted me to come down here.'],['COLE (V.O.)','The iron hatch swings open onto a staircase descending through black water. There should not be room beneath the city for this much dark.']]);}else{ $('fade').style.opacity='1';setTimeout(()=>setLevel(3),650);}} 
+ else if(currentLevel===3&&currentTarget===altarTarget){if(!levelVisited[3]){levelVisited[3]=true;showLevelSequence(levelStory[3]);}else if(!finalChoiceShown){finalChoiceShown=true;showLevelSequence([['CLARA VANCE','The gate can be sealed, but the voice below will ask you for someone. It will use their voice. Don’t mistake wanting for love.'],['COLE','What happens if I open it?'],['CLARA VANCE','The drowned come back wrong. The living become the door.']]);$('objective').textContent='OBJECTIVE: CHOOSE THE FATE OF THE DEEP WELL';}}
+ else if(currentLevel===3&&currentTarget===levelExitTarget&&finalChoiceShown){showEndingPrompt();}
+ else if(currentLevel===3&&finalChoiceShown){showEndingPrompt();}
+ else{$('log').textContent='Nothing here moves unless you give it a reason.';}}
+
 
 // Drifting smoke wisps: low-cost translucent sprites that catch the lamp glow.
 const smokePuffs=[];const smokeMat=new THREE.MeshBasicMaterial({color:0x777b80,transparent:true,opacity:.055,depthWrite:false,side:THREE.DoubleSide});
@@ -162,23 +326,33 @@ const doorTarget=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.8,.5),new THREE.Mesh
 const lampTarget=new THREE.Mesh(new THREE.SphereGeometry(.45),new THREE.MeshBasicMaterial({visible:false}));lampTarget.position.set(-1.08,1.55,-1.55);scene.add(lampTarget);
 const raycaster=new THREE.Raycaster();const center=new THREE.Vector2(0,0);
 const keys={};let started=false,locked=false,smoking=false,dialogueIndex=-1,doorOpened=false,photoRead=false,matchTimer=0,clock=new THREE.Clock(),time=0;
-let yaw=0,pitch=0, bob=0, moving=false, currentTarget=null;
+let yaw=0,pitch=0, bob=0, moving=false, currentTarget=null, irisIntroduced=false, radioHeard=false, endingReached=false;
 const story=[
  {speaker:'COLE (V.O.)',line:'A man can drown in this city without ever touching the bay. All it takes is three missed payments and a badge turned in for scrap.'},
  {speaker:'COLE',line:'Door’s open. Unless you’re the landlord.'},
- {speaker:'IRIS VANCE',line:'Detective Cole? They told me at the precinct you don’t take orders from the Commissioner anymore.'},
- {speaker:'IRIS VANCE',line:'My sister Clara. She hasn’t slept in her bed for three nights. She isn’t in the morgue, and she isn’t in jail.'},
- {speaker:'COLE',line:'Kids run off every night in the Basin, Miss Vance. Usually chasing a needle or a musician.'},
- {speaker:'IRIS VANCE',line:'She didn’t run. Men in yellow slickers dragged her into the municipal storm line behind Pier 14. They call themselves the Congregation of the Sinking Sun.'},
- {speaker:'IRIS VANCE',line:'Find her before midnight strikes. Warehouse 19 gives access to the old sluice gates. Keep your gun loaded, Detective.'}
+ {speaker:'IRIS VANCE',line:'Detective Cole? They told me at the precinct you don’t take orders from Commissioner Vale anymore.'},
+ {speaker:'IRIS VANCE',line:'My sister Clara. Three nights missing. Not in the morgue, not in a cell. The police filed her under RUNAWAY before I finished giving them her name.'},
+ {speaker:'COLE',line:'That’s how the Basin works. If the poor disappear, the paperwork gets lighter.'},
+ {speaker:'IRIS VANCE',line:'I saw men in yellow slickers drag her into the storm line behind Pier 14. They called themselves the Congregation of the Sinking Sun.'},
+ {speaker:'COLE',line:'A cult, a flooded tunnel, and a missing girl. You’re making a strong case for staying home.'},
+ {speaker:'IRIS VANCE',line:'Then look at the photograph. Clara wore that pendant every day. Someone sent it back to me with a key and a note.'},
+ {speaker:'COLE',line:'“The deep well is opening. Do not let her call me.” Who wrote this?'},
+ {speaker:'IRIS VANCE',line:'Dr. Elias Rook. He ran the city’s flood-control project before they sealed the old sluice gates. He died twelve years ago.'},
+ {speaker:'COLE',line:'Dead men are cheap witnesses. They never ask for a fee.'},
+ {speaker:'IRIS VANCE',line:'Warehouse 19. Midnight. If Clara is alive, that is where they’ll take her. Please, Detective.'},
+ {speaker:'COLE (V.O.)',line:'I had one working match, a bad knee, and a city full of people who’d rather believe in ghosts than admit what they’d done.'},
+ {speaker:'RADIO DISPATCH',line:'Unit Nine to any available investigator. Reports of movement at Warehouse 19. Flood sirens are cycling without a control signal. Stay clear of the water.'},
+ {speaker:'COLE',line:'Of course they are.'},
+ {speaker:'THE WATCHER',line:'She has already heard the water speaking. You’re too late to stop the first door.'}
 ];
-function showDialogue(index){dialogueIndex=index;const d=story[index];$('speaker').textContent=d.speaker;$('line').textContent=d.line;$('dialogue').style.display='block';}
-function hideDialogue(){$('dialogue').style.display='none';dialogueIndex=-1;}
-$('continue').addEventListener('click',()=>{if(dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else{hideDialogue();$('objective').textContent='OBJECTIVE: INSPECT THE PHOTOGRAPH';$('chapterText').textContent='The client has left a picture and a key. The story she told you feels rehearsed.';}});
-function updateHint(){raycaster.setFromCamera(center,camera);const hits=raycaster.intersectObjects([photoTarget,doorTarget,lampTarget],false);currentTarget=hits.length?hits[0].object:null;let text='';if(currentTarget===photoTarget)text=photoRead?'PHOTOGRAPH — EXAMINED':'E · EXAMINE PHOTOGRAPH';else if(currentTarget===doorTarget)text=doorOpened?'THE HALL IS DARK':'E · ANSWER THE DOOR';else if(currentTarget===lampTarget)text='A CHEAP DESK LAMP';$('hint').textContent=text;}
-function interact(){if($('dialogue').style.display==='block'){if(dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else{$('dialogue').style.display='none';dialogueIndex=-1;}return;}if(currentTarget===doorTarget){if(!doorOpened){doorOpened=true;door.rotation.y=-.95;door.position.x=-.68;knob.position.x=-.18;$('chapterText').textContent='A soaked woman in a beige trench coat stands in the doorway. She carries a small pigskin satchel.';$('objective').textContent='OBJECTIVE: HEAR IRIS OUT';showDialogue(1);setTimeout(()=>{if(dialogueIndex===1)showDialogue(2)},5000);}else{$('log').textContent='THE HALLWAY DISAPPEARS INTO RAIN AND SHADOW.';}}else if(currentTarget===photoTarget){photoRead=true;$('chapterTitle').textContent='The Photograph';$('chapterText').textContent='A young woman wears an antique silver pendant. On the back: “The deep well is opening. Do not let her call me.”';$('objective').textContent='CLUE RECORDED: THE DEEP WELL';$('log').textContent='CLUE LOG UPDATED — HANDWRITING, PENDANT, A WARNING.';showCustom('COLE','The deep well is opening. Do not let her call me. That’s not a missing-person note. That’s a warning.');}else{$('log').textContent='A tired office. A bad lamp. Rain that won’t let up.';}}
+function showDialogue(index){levelSequence=null;dialogueIndex=index;const d=story[index];$('speaker').textContent=d.speaker;$('line').textContent=d.line;$('dialogue').style.display='block';if(d.speaker==='THE WATCHER'){watcher.visible=true;watcher.position.x=1.25;watcher.position.z=-4.15;clara.visible=true;}if(d.speaker==='RADIO DISPATCH'){radioHeard=true;$('log').textContent='RADIO FREQUENCY LOCKED — WAREHOUSE 19';}}
+function hideDialogue(){$('dialogue').style.display='none';$('endingChoices').style.display='none';$('continue').style.display='';endingChoiceActive=false;dialogueIndex=-1;}
+function finishConversation(){hideDialogue();irisIntroduced=true;iris.visible=true;$('objective').textContent=photoRead?'OBJECTIVE: FIND THE EXIT':'OBJECTIVE: INSPECT THE PHOTOGRAPH';$('chapterText').textContent='Iris waits beside the door, watching the rain. The photograph and iron key are the only leads you have.';}
+$('continue').addEventListener('click',advanceDialogue);
+function updateHint(){raycaster.setFromCamera(center,camera);const targets=[photoTarget,doorTarget,lampTarget,dockTarget,dockExitTarget,warehouseTarget,hatchTarget,altarTarget,levelExitTarget];const hits=raycaster.intersectObjects(targets,false);currentTarget=hits.length?hits[0].object:null;let text='';if(currentTarget===photoTarget)text=photoRead?'PHOTOGRAPH — EXAMINED':'E · EXAMINE PHOTOGRAPH';else if(currentTarget===doorTarget)text=doorOpened?'THE HALL IS DARK':'E · ANSWER THE DOOR';else if(currentTarget===lampTarget)text='A CHEAP DESK LAMP';else if(currentTarget===dockTarget)text='E · SPEAK TO THE HARBOR WARDEN';else if(currentTarget===dockExitTarget)text='E · FOLLOW THE RED LAMPS';else if(currentTarget===warehouseTarget)text='E · SEARCH THE WAREHOUSE';else if(currentTarget===hatchTarget)text=warehouseInspected?'E · DESCEND THE HATCH':'E · EXAMINE THE IRON HATCH';else if(currentTarget===altarTarget)text='E · SPEAK TO CLARA';else if(currentTarget===levelExitTarget)text='E · FACE THE DEEP WELL';$('hint').textContent=text;}
+function interact(){if($('dialogue').style.display==='block'){advanceDialogue();return;}if(currentLevel>0){interactLevel();return;}if(currentTarget===doorTarget){if(!doorOpened){doorOpened=true;door.rotation.y=-.95;door.position.x=-.68;knob.position.x=-.18;iris.visible=true;irisIntroduced=true;iris.position.set(0,0,3.55);$('chapterText').textContent='A soaked woman in a teal raincoat stands in the doorway, clutching a pigskin satchel.';$('objective').textContent='OBJECTIVE: HEAR IRIS OUT';showDialogue(1);}else if(photoRead&&!endingReached){endingReached=true;iris.visible=false;watcher.visible=true;watcher.position.set(1.3,0,-4.15);$('chapterTitle').textContent='The First Door';$('chapterText').textContent='The office seems to stretch as the lights fail. A shape stands behind the rain-streaked glass.';$('objective').textContent='CHAPTER I COMPLETE — THE BASIN IS CALLING';$('log').textContent='NEW LEAD: PIER 14 · FOLLOW THE RED LAMPS';$('fade').style.opacity='1';setTimeout(()=>{setLevel(1);showLevelSequence([['COLE (V.O.)','Pier 14. The city ends here, or pretends to. The bay is black glass beneath the red lamps.']]);},1300);}else{$('log').textContent='THE HALLWAY DISAPPEARS INTO RAIN AND SHADOW.';}}else if(currentTarget===photoTarget){photoRead=true;clara.visible=true;$('chapterTitle').textContent='The Photograph';$('chapterText').textContent='Clara Vance wears an antique silver pendant. The note on the back reads: “The deep well is opening. Do not let her call me.”';$('objective').textContent='CLUE RECORDED: THE DEEP WELL';$('log').textContent='CLUE LOG UPDATED — PENDANT, HANDWRITING, IRON KEY.';showCustom('COLE','The deep well is opening. Do not let her call me. Rook died twelve years ago. So who sent this?');}else if(currentTarget===lampTarget){deskLamp.intensity=deskLamp.intensity>1?2:19;$('log').textContent=deskLamp.intensity>2?'THE LAMP CATCHES, THROWING AMBER LIGHT OVER THE CLUES.':'THE ROOM FALLS BACK INTO BLUE SHADOW.';}else{$('log').textContent='A tired office. A bad lamp. Rain that won’t let up.';}}
 function showCustom(speaker,line){$('speaker').textContent=speaker;$('line').textContent=line;$('dialogue').style.display='block';dialogueIndex=story.length-1;}
-function toggleSmoke(){smoking=!smoking;matchTimer=smoking?10:0;handGroup.visible=smoking;$('smokeValue').textContent=smoking?'LIT · 10 SEC':'UNLIT';$('smokeBtn').textContent=smoking?'F · EXTINGUISH':'F · LIGHT MATCH';emberLight.intensity=smoking?2.2:0;if(smoking){$('log').textContent='A match flares. For a moment, the room holds still.';playMatch();}else{$('log').textContent='The ember dies. The rain fills the silence.';}}
+function toggleSmoke(){smoking=!smoking;matchTimer=smoking?9999:0;handGroup.visible=smoking;$('smokeValue').textContent=smoking?'LIT · SMOLDERING':'UNLIT';$('smokeBtn').textContent=smoking?'F · EXTINGUISH':'F · LIGHT CIGARETTE';emberLight.intensity=smoking?2.2:0;for(const p of cigSmoke){p.life=Math.random();p.mesh.visible=smoking;}if(smoking){$('log').textContent='The match catches. Smoke curls from the glowing tip.';playMatch();}else{$('log').textContent='The ember dies. The rain fills the silence.';for(const p of cigSmoke)p.mesh.visible=false;}}
 let audioCtx=null,master=null,ambientStarted=false;
 function startAudio(){if(ambientStarted)return;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();master=audioCtx.createGain();master.gain.value=.16;master.connect(audioCtx.destination);const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.15;const noise=audioCtx.createBufferSource();noise.buffer=buffer;noise.loop=true;const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=480;const g=audioCtx.createGain();g.gain.value=.17;noise.connect(filter);filter.connect(g);g.connect(master);noise.start();const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=48;const og=audioCtx.createGain();og.gain.value=.08;osc.connect(og);og.connect(master);osc.start();ambientStarted=true;}catch(e){}}
 function playMatch(){if(!audioCtx)return;const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(1500,t);osc.frequency.exponentialRampToValueAtTime(180,t+.12);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);osc.connect(g);g.connect(master);osc.start(t);osc.stop(t+.18);}
@@ -209,15 +383,18 @@ const clampRoom=()=>{camera.position.x=THREE.MathUtils.clamp(camera.position.x,-
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);time+=dt;
   rainGeo.attributes.position.array.forEach((v,i)=>{if(i%6===1||i%6===4){rainGeo.attributes.position.array[i]-=dt*5;if(rainGeo.attributes.position.array[i]<-1)rainGeo.attributes.position.array[i]=8;}});
   rainGeo.attributes.position.needsUpdate=true;
-  ceilingLamp.intensity=17+Math.sin(time*2.1)*.7+(Math.random()<.008?-6:0);
-  windowLight.intensity=9+Math.sin(time*3.3)*1.3;
+  ceilingLamp.intensity=10+Math.sin(time*2.1)*1.1+(Math.random()<.012?-5:0);
+  windowLight.intensity=6+Math.sin(time*3.3)*2.0;
+  if(clara.visible&&currentLevel===0){clara.position.x=Math.sin(time*.55)*.045;clara.rotation.y=Math.sin(time*.3)*.06;clara.visible=photoRead||endingReached;}
+  if(watcher.visible){watcher.rotation.y=Math.sin(time*.8)*.035;}
   for(const p of smokePuffs){p.mesh.position.y+=dt*(.06+(p.seed%4)*.018);p.mesh.position.x+=Math.sin(time*.35+p.seed)*dt*.035;p.mesh.material.opacity=(.018+(.5+.5*Math.sin(time*.7+p.seed))*.025)*(smoking?1.6:1);p.mesh.lookAt(camera.position);if(p.mesh.position.y>3.25){p.mesh.position.y=1.45;p.mesh.position.x=-1.05+(Math.random()-.5)*1.5;}}
+  if(smoking){for(const p of cigSmoke){p.life+=dt*.48;if(p.life>1)p.life=0;p.mesh.visible=true;p.mesh.position.set(.48+Math.sin(p.life*8+p.seed)*.045,-.28+p.life*.68,-.78);p.mesh.scale.setScalar(.35+p.life*1.9);p.mesh.material.opacity=(1-p.life)*.2;p.mesh.lookAt(camera.position);}}
   if(started){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
     const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let dx=0,dz=0;
     if(keys.KeyW||keys.ArrowUp){dx+=forward.x;dz+=forward.z;}if(keys.KeyS||keys.ArrowDown){dx-=forward.x;dz-=forward.z;}if(keys.KeyA){dx-=right.x;dz-=right.z;}if(keys.KeyD){dx+=right.x;dz+=right.z;}
     moving=dx!==0||dz!==0;if(moving){const l=Math.hypot(dx,dz)||1;camera.position.x+=dx/l*dt*2.1;camera.position.z+=dz/l*dt*2.1;bob+=dt*9;}clampRoom();camera.position.y=1.65+(moving?Math.sin(bob)*.018:Math.sin(time*1.2)*.006);
     handGroup.position.y=smoking?Math.sin(time*2)*.006:0;
-    if(smoking){matchTimer-=dt;$('smokeValue').textContent='LIT · '+Math.max(0,Math.ceil(matchTimer))+' SEC';emberLight.intensity=1.8+Math.sin(time*18)*.5;if(matchTimer<=0){smoking=false;handGroup.visible=false;emberLight.intensity=0;$('smokeValue').textContent='UNLIT';$('smokeBtn').textContent='F · LIGHT MATCH';}}
+    if(smoking){emberLight.intensity=1.8+Math.sin(time*18)*.5;ember.material.emissiveIntensity=2.5+Math.sin(time*14)*.9;}
     updateHint();
   }
   renderer.render(scene,camera);

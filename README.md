@@ -18,14 +18,17 @@ Then open http://localhost:8000.
 
 - First-person camera and mouse look
 - WASD movement in a low-poly detective's office
-- Late-PS1-inspired low-resolution rendering, dim amber pools of light, heavy blue-black fog, drifting smoke, rain, and scanlines
+- Late-PS1 low-resolution rendering, chunkier silhouettes, higher-contrast blue, teal, amber, and crimson color accents, fog, rain, scanlines, and drifting smoke
 - Mobile touch controls: on-screen movement pad, drag-to-look, Interact, and Match buttons
-- Interactions for the office door and photograph
-- Opening dialogue from the story
-- A cigarette/match toggle with a small light and synthesized match sound
+- Low-poly characters for Iris Vance, Clara Vance, the Harbor Warden, the masked Basin Watcher, and the Congregation's figures
+- Four connected chapters: Cole's office, rain-soaked Pier 14, Warehouse 19, and the flooded drainage cathedral
+- Expanded dialogue and story about missing Clara, the Congregation of the Sinking Sun, Dr. Elias Rook, Commissioner Vale, and the Deep Well
+- Investigable clues, a municipal seal and iron hatch, character encounters, and two final outcomes based on whether Cole seals or opens the Deep Well
+- A correctly oriented cigarette with a glowing tip and smoke wisps that rise from the lit cigarette
+- Desk-lamp interaction, photograph inspection, chapter transitions, and an ending choice
 - Responsive start screen and HUD
 
-This is an early greybox/atmosphere pass, not the finished game. The character model, full Iris animation, detailed inspection UI, robust smoke mechanic, and later scenes are not implemented yet.
+This is still an in-progress prototype. The four chapter spaces, core character encounters, story sequences, and two endings are now represented in JavaScript, but collision polish, fully animated characters, voice acting, and thorough playtesting remain future work.
 
 ## Controls
 
@@ -33,7 +36,7 @@ This is an early greybox/atmosphere pass, not the finished game. The character m
 - **Touchscreen** — Drag the right side of the scene to look; use Interact and Match buttons
 - **Mouse** — Look around (click the game to recapture the pointer)
 - **E** — Interact / inspect
-- **F** — Light or extinguish the cigarette ember
+- **F** — Light or extinguish the cigarette; watch the smoke rise from the glowing tip
 - **Enter** — Continue dialogue
 - **Esc** — Release mouse capture
 
