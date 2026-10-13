@@ -20,13 +20,15 @@ Then open http://localhost:8000.
 - WASD movement in a low-poly detective's office
 - Late-PS1 low-resolution rendering, chunkier silhouettes, higher-contrast blue, teal, amber, and crimson color accents, fog, rain, scanlines, and drifting smoke
 - Mobile touch controls: on-screen movement pad, drag-to-look, Interact, and Match buttons
-- Low-poly character models for Iris Vance, Clara Vance's eerie silhouette, and the masked Basin Watcher
-- Expanded dialogue, the missing-person case, the Deep Well clue, the dead engineer Elias Rook, radio dispatch, and the Warehouse 19 lead
+- Low-poly characters for Iris Vance, Clara Vance, the Harbor Warden, the masked Basin Watcher, and the Congregation's figures
+- Four connected chapters: Cole's office, rain-soaked Pier 14, Warehouse 19, and the flooded drainage cathedral
+- Expanded dialogue and story about missing Clara, the Congregation of the Sinking Sun, Dr. Elias Rook, Commissioner Vale, and the Deep Well
+- Investigable clues, a municipal seal and iron hatch, character encounters, and two final outcomes based on whether Cole seals or opens the Deep Well
 - A correctly oriented cigarette with a glowing tip and smoke wisps that rise from the lit cigarette
-- Desk-lamp interaction, photograph inspection, and chapter-ending story beat
+- Desk-lamp interaction, photograph inspection, chapter transitions, and an ending choice
 - Responsive start screen and HUD
 
-This is still an in-progress prototype. The story now reaches the Warehouse 19 lead, but the warehouse/tunnel chapter, full character animation, voice acting, and a complete multi-level campaign remain future work.
+This is still an in-progress prototype. The four chapter spaces, core character encounters, story sequences, and two endings are now represented in JavaScript, but collision polish, fully animated characters, voice acting, and thorough playtesting remain future work.
 
 ## Controls
 
