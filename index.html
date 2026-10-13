@@ -7,7 +7,7 @@
 <style>
 :root{color-scheme:dark;--cyan:#a6c9d2;--amber:#e6a05a;--panel:rgba(7,10,14,.88)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#e9e1d5;font-family:Georgia,"Courier New",serif}
-canvas{display:block;position:fixed;inset:0;z-index:1;image-rendering:pixelated}
+canvas{display:block;position:fixed;inset:0;z-index:1;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none}
 #grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.22;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.48) 3px),radial-gradient(ellipse at center,transparent 22%,#000 100%);mix-blend-mode:multiply}
 #hud{position:fixed;inset:0;z-index:4;pointer-events:none;text-shadow:0 2px 5px #000}
 #mast{position:absolute;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:start;gap:12px}
@@ -363,15 +363,15 @@ renderer.domElement.addEventListener('click',()=>{if(started&&$('dialogue').styl
 const touchUI=$('touchControls');
 for(const el of document.querySelectorAll('[data-key]')){
  const code=el.dataset.key;
- const down=e=>{e.preventDefault();keys[code]=true;el.style.background='#4b3826dd';};
+ const down=e=>{e.preventDefault();if(e.pointerType==='touch')el.setPointerCapture?.(e.pointerId);keys[code]=true;el.style.background='#4b3826dd';};
  const up=e=>{e.preventDefault();keys[code]=false;el.style.background='';};
  el.addEventListener('pointerdown',down);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);
 }
-$('touchInteract').addEventListener('pointerdown',e=>{e.preventDefault();interact();});
-$('touchSmoke').addEventListener('pointerdown',e=>{e.preventDefault();toggleSmoke();});
+$('touchInteract').addEventListener('pointerdown',e=>{e.preventDefault();if(e.pointerType==='touch')$('touchInteract').setPointerCapture?.(e.pointerId);interact();});
+$('touchSmoke').addEventListener('pointerdown',e=>{e.preventDefault();if(e.pointerType==='touch')$('touchSmoke').setPointerCapture?.(e.pointerId);toggleSmoke();});
 let lookPointer=null,lastTouchX=0,lastTouchY=0;
-renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!started)return;if(e.clientX<innerWidth*.38)return;lookPointer=e.pointerId;lastTouchX=e.clientX;lastTouchY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);});
-renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||e.pointerId!==lookPointer||!started)return;const dx=e.clientX-lastTouchX,dy=e.clientY-lastTouchY;lastTouchX=e.clientX;lastTouchY=e.clientY;yaw-=dx*.004;pitch=THREE.MathUtils.clamp(pitch-dy*.004,-1.2,1.15);});
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!started||$('dialogue').style.display==='block')return;if(e.clientX<innerWidth*.38)return;lookPointer=e.pointerId;lastTouchX=e.clientX;lastTouchY=e.clientY;try{renderer.domElement.setPointerCapture(e.pointerId);}catch(_){}});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||e.pointerId!==lookPointer||!started)return;const dx=e.clientX-lastTouchX,dy=e.clientY-lastTouchY;lastTouchX=e.clientX;lastTouchY=e.clientY;yaw-=dx*.006;pitch=THREE.MathUtils.clamp(pitch-dy*.006,-1.2,1.15);});
 const endLook=e=>{if(e.pointerId===lookPointer)lookPointer=null;};renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement;});
 document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=THREE.MathUtils.clamp(pitch,-1.2,1.15);});
