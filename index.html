@@ -46,7 +46,7 @@ canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
   <section id="chapter"><div class="kicker">ACT I · THE OFFICE OF LOST SOULS</div><h2 id="chapterTitle">The Retainer</h2><p id="chapterText">Midnight. A storm works the windows like a debt collector. Someone is waiting outside your office.</p><div id="objective" class="kicker" style="margin-top:10px;margin-bottom:0">OBJECTIVE: ANSWER THE DOOR</div></section>
   <div id="crosshair"></div><div id="hint"></div><div id="smoke">SMOKE METER<b id="smokeValue">STEADY</b></div>
   <div id="bottom"><div id="log">WASD MOVE · MOUSE LOOK · E INTERACT · F LIGHT CIGARETTE · ESC RELEASE MOUSE</div><div id="actions"><button id="smokeBtn">F · LIGHT MATCH</button><button id="inspectBtn">E · INSPECT</button></div></div>
-  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button></div>
+  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button><div id="endingChoices" style="display:none;clear:both;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:14px"><button id="sealEnding">SEAL THE GATE</button><button id="openEnding">OPEN THE GATE</button></div></div>
 </div>
 <div id="fade"></div>
 <div id="touchControls" aria-label="Touch game controls"><div id="movePad"><div class="touchKey" id="keyW" data-key="KeyW">▲</div><div class="touchKey" id="keyA" data-key="KeyA">◀</div><div class="touchKey" id="keyS" data-key="KeyS">▼</div><div class="touchKey" id="keyD" data-key="KeyD">▶</div></div><div id="touchActions"><div class="touchKey" id="touchInteract">INTERACT</div><div class="touchKey" id="touchSmoke">MATCH</div></div><div id="lookLabel">DRAG RIGHT SIDE TO LOOK</div></div>
@@ -279,18 +279,40 @@ const levelStory={
   ['CLARA VANCE','You already have. Every night you come here in your dreams. The final gate needs a choice, Cole. Not a key.']
  ]
 };
-let levelSequence=null,levelSequenceIndex=0,levelVisited={1:false,2:false,3:false},warehouseInspected=false,finalChoiceShown=false;
+let levelSequence=null,levelSequenceIndex=0,levelVisited={1:false,2:false,3:false},warehouseInspected=false,finalChoiceShown=false,endingChoiceActive=false;
 function showLevelSequence(lines){levelSequence=lines;levelSequenceIndex=0;renderLevelLine();}
 function renderLevelLine(){const d=levelSequence[levelSequenceIndex];$('speaker').textContent=d[0];$('line').textContent=d[1];$('dialogue').style.display='block';if(d[0]==='THE WATCHER'){watcher.visible=true;}}
-function advanceDialogue(){if(levelSequence){levelSequenceIndex++;if(levelSequenceIndex<levelSequence.length){renderLevelLine();return;}levelSequence=null;hideDialogue();return;}if(dialogueIndex>=0&&dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else finishConversation();}
+function advanceDialogue(){if(endingChoiceActive)return;if(levelSequence){levelSequenceIndex++;if(levelSequenceIndex<levelSequence.length){renderLevelLine();return;}levelSequence=null;hideDialogue();return;}if(dialogueIndex>=0&&dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else finishConversation();}
 function setLevel(n){currentLevel=n;levelGroups.forEach((g,i)=>g.visible=(i===n-1));camera.position.set(n*20,1.65,n===1?3.5:n===2?3.5:3.5);yaw=0;pitch=0;camera.rotation.set(0,0,0);keys.KeyW=keys.KeyA=keys.KeyS=keys.KeyD=false;iris.visible=false;clara.visible=false;watcher.visible=false;deskLamp.intensity=n===0?deskLamp.intensity:0;scene.fog.color.set(n===1?0x102334:n===2?0x171923:0x160f1c);scene.fog.density=n===1?.045:n===2?.052:.06;$('fade').style.opacity='0';$('dialogue').style.display='none';$('chapterTitle').textContent=n===1?'Pier 14':n===2?'Warehouse 19':'The Drainage Cathedral';$('chapter').querySelector('.kicker').textContent=n===1?'ACT II · THE RED LAMPS':n===2?'ACT III · THE CITY UNDER THE CITY':'ACT IV · THE DEEP WELL';$('chapterText').textContent=n===1?'Rain runs uphill along the pier. Red lamps mark a route no city map admits exists.':n===2?'The warehouse is full of things the city claims it destroyed. Something below is speaking in familiar voices.':'Beneath the Basin, the drowned city gathers around a gate older than its streets.';$('objective').textContent=n===1?'OBJECTIVE: FIND WAREHOUSE 19':n===2?'OBJECTIVE: FIND THE HATCH':'OBJECTIVE: SPEAK TO CLARA';$('log').textContent=n===1?'NEW LOCATION — PIER 14':n===2?'NEW LOCATION — WAREHOUSE 19':'NEW LOCATION — DRAINAGE CATHEDRAL';}
+
+function showEndingPrompt(){
+ levelSequence=null;dialogueIndex=-1;endingChoiceActive=true;
+ $('speaker').textContent='THE DEEP WELL';
+ $('line').textContent='COLE. We kept a place for you. We kept every name you tried to forget. Seal the gate and let the dead be dead, or open it and let the city remember everything.';
+ $('dialogue').style.display='block';$('continue').style.display='none';$('endingChoices').style.display='flex';
+ $('objective').textContent='FINAL CHOICE: SEAL THE GATE OR OPEN IT';
+}
+function finishEnding(seal){
+ endingChoiceActive=false;$('endingChoices').style.display='none';$('continue').style.display='';
+ $('fade').style.opacity='1';
+ setTimeout(()=>{
+  if(seal){$('chapterTitle').textContent='The Quiet Below';$('chapterText').textContent='The gate seals. The voices stop. At dawn, Cole walks back into the rain carrying no proof, only the silence he chose.';$('log').textContent='ENDING UNLOCKED — THE QUIET BELOW';}
+  else{$('chapterTitle').textContent='The City Remembers';$('chapterText').textContent='The gate opens. Across the Basin, every drowned voice rises from the drains. Somewhere above, a child laughs in the rain.';$('log').textContent='ENDING UNLOCKED — THE CITY REMEMBERS';}
+  $('objective').textContent='CASE FILE 001 — END';$('dialogue').style.display='none';$('fade').style.opacity='0';finalChoiceShown=false;
+  $('chapter').querySelector('.kicker').textContent=seal?'ENDING A · THE QUIET BELOW':'ENDING B · THE CITY REMEMBERS';
+  $('line').textContent=seal?'The silence follows you home.':'Every drain in the Basin begins to sing.';
+ },800);
+}
+$('sealEnding').addEventListener('click',()=>finishEnding(true));
+$('openEnding').addEventListener('click',()=>finishEnding(false));
+
 function interactLevel(){if(currentLevel===1&&currentTarget===dockExitTarget){$('fade').style.opacity='1';setTimeout(()=>{setLevel(2);showLevelSequence([['COLE (V.O.)','Warehouse 19 stood at the end of the pier like a missing tooth. The lock had been cut from the outside.'],['COLE','Someone wanted this place opened. They just didn’t want to be here when it happened.']]);},650);}
  else if(currentLevel===1&&currentTarget===dockTarget){if(!levelVisited[1]){levelVisited[1]=true;showLevelSequence(levelStory[1]);}else{$('log').textContent='The harbor warden will not meet your eyes. The red lamps point north.';}}
  else if(currentLevel===2&&currentTarget===warehouseTarget){if(!levelVisited[2]){levelVisited[2]=true;showLevelSequence(levelStory[2]);}else{$('log').textContent='The list of names lies where you left it. Your own name is still wet.';}}
  else if(currentLevel===2&&currentTarget===hatchTarget){if(!warehouseInspected){warehouseInspected=true;$('objective').textContent='OBJECTIVE: DESCEND TO THE DRAINAGE CATHEDRAL';$('log').textContent='CLUE: MUNICIPAL SEAL · THE HATCH IS UNLOCKED';showLevelSequence([['COLE','The key fits. Of course it fits. Someone wanted me to come down here.'],['COLE (V.O.)','The iron hatch swings open onto a staircase descending through black water. There should not be room beneath the city for this much dark.']]);}else{ $('fade').style.opacity='1';setTimeout(()=>setLevel(3),650);}} 
  else if(currentLevel===3&&currentTarget===altarTarget){if(!levelVisited[3]){levelVisited[3]=true;showLevelSequence(levelStory[3]);}else if(!finalChoiceShown){finalChoiceShown=true;showLevelSequence([['CLARA VANCE','The gate can be sealed, but the voice below will ask you for someone. It will use their voice. Don’t mistake wanting for love.'],['COLE','What happens if I open it?'],['CLARA VANCE','The drowned come back wrong. The living become the door.']]);$('objective').textContent='OBJECTIVE: CHOOSE THE FATE OF THE DEEP WELL';}}
- else if(currentLevel===3&&currentTarget===levelExitTarget&&finalChoiceShown){showLevelSequence([['THE DEEP WELL','COLE. We kept a place for you. We kept the sound of your daughter’s first breath. We kept every name you tried to forget.'],['COLE','You don’t get to use her voice.'],['CLARA VANCE','Then choose. Seal the gate and let the dead be dead. Or open it, and let the city remember everything.']]);$('objective').textContent='FINAL CHOICE: SEAL THE GATE OR OPEN IT';}
- else if(currentLevel===3&&finalChoiceShown){const open=confirm('THE DEEP WELL\n\nSeal the gate and let the dead be dead? Choose Cancel to open it.');$('fade').style.opacity='1';setTimeout(()=>{if(open){$('chapterTitle').textContent='The Quiet Below';$('chapterText').textContent='The gate seals. The voices stop. At dawn, Cole walks back into the rain carrying no proof, only the silence he chose.';$('log').textContent='ENDING UNLOCKED — THE QUIET BELOW';}else{$('chapterTitle').textContent='The City Remembers';$('chapterText').textContent='The gate opens. Across the Basin, every drowned voice rises from the drains. Somewhere above, a child laughs in the rain.';$('log').textContent='ENDING UNLOCKED — THE CITY REMEMBERS';} $('objective').textContent='CASE FILE 001 — END';$('fade').style.opacity='0';$('dialogue').style.display='none';finalChoiceShown=false;},800);}
+ else if(currentLevel===3&&currentTarget===levelExitTarget&&finalChoiceShown){showEndingPrompt();}
+ else if(currentLevel===3&&finalChoiceShown){showEndingPrompt();}
  else{$('log').textContent='Nothing here moves unless you give it a reason.';}}
 
 
@@ -324,7 +346,7 @@ const story=[
  {speaker:'THE WATCHER',line:'She has already heard the water speaking. You’re too late to stop the first door.'}
 ];
 function showDialogue(index){levelSequence=null;dialogueIndex=index;const d=story[index];$('speaker').textContent=d.speaker;$('line').textContent=d.line;$('dialogue').style.display='block';if(d.speaker==='THE WATCHER'){watcher.visible=true;watcher.position.x=1.25;watcher.position.z=-4.15;clara.visible=true;}if(d.speaker==='RADIO DISPATCH'){radioHeard=true;$('log').textContent='RADIO FREQUENCY LOCKED — WAREHOUSE 19';}}
-function hideDialogue(){$('dialogue').style.display='none';dialogueIndex=-1;}
+function hideDialogue(){$('dialogue').style.display='none';$('endingChoices').style.display='none';$('continue').style.display='';endingChoiceActive=false;dialogueIndex=-1;}
 function finishConversation(){hideDialogue();irisIntroduced=true;iris.visible=true;$('objective').textContent=photoRead?'OBJECTIVE: FIND THE EXIT':'OBJECTIVE: INSPECT THE PHOTOGRAPH';$('chapterText').textContent='Iris waits beside the door, watching the rain. The photograph and iron key are the only leads you have.';}
 $('continue').addEventListener('click',advanceDialogue);
 function updateHint(){raycaster.setFromCamera(center,camera);const targets=[photoTarget,doorTarget,lampTarget,dockTarget,dockExitTarget,warehouseTarget,hatchTarget,altarTarget,levelExitTarget];const hits=raycaster.intersectObjects(targets,false);currentTarget=hits.length?hits[0].object:null;let text='';if(currentTarget===photoTarget)text=photoRead?'PHOTOGRAPH — EXAMINED':'E · EXAMINE PHOTOGRAPH';else if(currentTarget===doorTarget)text=doorOpened?'THE HALL IS DARK':'E · ANSWER THE DOOR';else if(currentTarget===lampTarget)text='A CHEAP DESK LAMP';else if(currentTarget===dockTarget)text='E · SPEAK TO THE HARBOR WARDEN';else if(currentTarget===dockExitTarget)text='E · FOLLOW THE RED LAMPS';else if(currentTarget===warehouseTarget)text='E · SEARCH THE WAREHOUSE';else if(currentTarget===hatchTarget)text=warehouseInspected?'E · DESCEND THE HATCH':'E · EXAMINE THE IRON HATCH';else if(currentTarget===altarTarget)text='E · SPEAK TO CLARA';else if(currentTarget===levelExitTarget)text='E · FACE THE DEEP WELL';$('hint').textContent=text;}
