@@ -8,7 +8,7 @@
 :root{color-scheme:dark;--cyan:#a6c9d2;--amber:#e6a05a;--panel:rgba(7,10,14,.88)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#e9e1d5;font-family:Georgia,"Courier New",serif}
 canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
-#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.12;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.4) 3px),radial-gradient(ellipse at center,transparent 35%,#000 100%);mix-blend-mode:multiply}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.22;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.48) 3px),radial-gradient(ellipse at center,transparent 22%,#000 100%);mix-blend-mode:multiply}
 #hud{position:fixed;inset:0;z-index:4;pointer-events:none;text-shadow:0 2px 5px #000}
 #mast{position:absolute;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:start;gap:12px}
 #logo{font-family:"Courier New",monospace;font-size:19px;letter-spacing:.24em;font-weight:bold}#logo small{display:block;font-size:9px;letter-spacing:.17em;color:#b6a18a;margin-top:5px}
@@ -27,6 +27,15 @@ canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
 #card .eyebrow{font:10px "Courier New",monospace;letter-spacing:.3em;color:#dba568}#card h1{font-size:clamp(38px,8vw,68px);font-weight:normal;letter-spacing:.08em;margin:14px 0 4px}#card h1 span{color:#c58d54}#card h2{font:12px "Courier New",monospace;font-weight:normal;letter-spacing:.22em;color:#b8b3a8;margin:0 0 25px}#card p{color:#c7c0b5;font-size:14px;line-height:1.7}#start{margin-top:14px;background:#b98450;color:#100d0a;border:0;padding:13px 20px;font-weight:bold}#start:hover{background:#e1b27a}#card .small{font:10px "Courier New",monospace;line-height:1.8;color:#928e87;margin-top:19px}
 #smoke{position:absolute;right:20px;top:50%;transform:translateY(-50%);font:10px "Courier New",monospace;letter-spacing:.12em;color:#e6c7a2;text-align:right}#smoke b{display:block;font-size:18px;font-weight:normal;margin-top:4px}
 #fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:7;transition:opacity 1.5s}
+/* Touch HUD: translucent, diegetic controls that stay clear of dialogue. */
+#touchControls{display:none;position:fixed;inset:0;z-index:6;pointer-events:none;touch-action:none;font:11px 'Courier New',monospace;color:#e6d7c4}
+#movePad{position:absolute;left:16px;bottom:24px;display:grid;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px;gap:4px;pointer-events:auto}
+.touchKey{display:flex;align-items:center;justify-content:center;border:1px solid #c9b79a66;background:#090b0dbb;border-radius:5px;user-select:none;-webkit-user-select:none;touch-action:none;font-size:17px;box-shadow:inset 0 0 16px #0008}
+#keyW{grid-column:2;grid-row:1}#keyA{grid-column:1;grid-row:2}#keyS{grid-column:2;grid-row:2}#keyD{grid-column:3;grid-row:2}
+#touchActions{position:absolute;right:16px;bottom:27px;display:flex;flex-direction:column;gap:9px;pointer-events:auto}
+#touchActions .touchKey{width:68px;height:58px;font-size:10px;letter-spacing:.05em;border-radius:50%;background:#100e0bd9;border-color:#d5a46b77}
+#lookLabel{position:absolute;right:95px;bottom:15px;font-size:9px;opacity:.52;letter-spacing:.12em;pointer-events:none}
+@media(pointer:coarse),(max-width:700px){#touchControls.active{display:block}#bottom{bottom:8px;left:10px;right:10px}#actions{display:none}#log{max-width:60vw;font-size:8px;padding:6px}#smoke{display:none}#chapter{top:75px;left:12px;padding:7px 10px;max-width:calc(100vw - 24px)}#chapter p{font-size:11px;max-width:250px}#mast{top:12px;left:12px;right:12px}#logo{font-size:16px}#case{font-size:7px}#dialogue{bottom:150px;padding:13px;width:calc(100vw - 24px)}#line{font-size:13px}#hint{top:calc(50% + 22px);font-size:9px}#crosshair{opacity:.45}#card p{font-size:13px}}
 @media(max-width:600px){#chapter{top:105px;max-width:calc(100vw - 40px)}#case{font-size:8px}#log{max-width:52vw;font-size:9px}button{padding:9px 8px;font-size:9px}#smoke{top:auto;bottom:110px;right:15px}#dialogue{bottom:105px}}
 </style>
 </head>
@@ -40,6 +49,7 @@ canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
   <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button></div>
 </div>
 <div id="fade"></div>
+<div id="touchControls" aria-label="Touch game controls"><div id="movePad"><div class="touchKey" id="keyW" data-key="KeyW">▲</div><div class="touchKey" id="keyA" data-key="KeyA">◀</div><div class="touchKey" id="keyS" data-key="KeyS">▼</div><div class="touchKey" id="keyD" data-key="KeyD">▶</div></div><div id="touchActions"><div class="touchKey" id="touchInteract">INTERACT</div><div class="touchKey" id="touchSmoke">MATCH</div></div><div id="lookLabel">DRAG RIGHT SIDE TO LOOK</div></div>
 <div id="overlay"><div id="card"><div class="eyebrow">A CIG INTERACTIVE STORY</div><h1>ASH <span>&</span><br>EMBERS</h1><h2>A DETECTIVE STORY IN THE FLOODED BASIN</h2><p>A city can drown a man without ever touching the bay. Tonight, someone has brought you a photograph, an iron key, and a story that doesn't quite add up.</p><p>Explore Cole's office. Find the details worth noticing. Meet Iris Vance. This is an early playable prototype: the atmosphere and interactions are being built before the full case.</p><button id="start">ENTER THE OFFICE</button><div class="small">WASD TO MOVE · MOUSE TO LOOK · E TO INTERACT · F TO LIGHT A MATCH<br>HEADPHONES RECOMMENDED · AUDIO STARTS AFTER YOU ENTER</div></div></div>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"}}
@@ -50,15 +60,17 @@ import * as THREE from 'three';
 const $ = id => document.getElementById(id);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x090d12);
-scene.fog = new THREE.FogExp2(0x090d12, 0.052);
-const camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.05, 120);
+scene.fog = new THREE.FogExp2(0x090d12, 0.078);
+const camera = new THREE.PerspectiveCamera(66, innerWidth/innerHeight, 0.08, 65);
 camera.position.set(0,1.65,4.6);
 const renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance'});
-renderer.setPixelRatio(1);
-renderer.setSize(innerWidth,innerHeight);
+// Intentionally render at a small internal resolution for a late-PS1 look.
+const ps1Scale = 0.58;
+function resizePS1(){renderer.setPixelRatio(1);renderer.setSize(Math.max(320,Math.floor(innerWidth*ps1Scale)),Math.max(200,Math.floor(innerHeight*ps1Scale)),false);renderer.domElement.style.width='100vw';renderer.domElement.style.height='100dvh';}
+resizePS1();
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 0.78;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
@@ -70,10 +82,10 @@ function box(name,x,y,z,sx,sy,sz,material,cast=true,receive=true){const o=new TH
 function cylinder(name,x,y,z,r1,r2,h,material,seg=8,rotX=0){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,seg),mats[material]);o.name=name;o.position.set(x,y,z);o.rotation.x=rotX;o.castShadow=true;scene.add(o);return o;}
 function addLight(color,intensity,pos,dist=12){const l=new THREE.PointLight(color,intensity,dist,2);l.position.set(...pos);scene.add(l);return l;}
 
-scene.add(new THREE.HemisphereLight(0x8798a7,0x211710,1.0));
-const ceilingLamp=addLight(0xffc17a,19,[0,3.1,-0.2],9);
-const deskLamp=addLight(0xffa64d,27,[-1.05,2.1,-.5],5);
-const windowLight=addLight(0x537a91,11,[0,2.4,-4.6],8);
+scene.add(new THREE.HemisphereLight(0x697582,0x100b09,0.48));
+const ceilingLamp=addLight(0xffb96d,8,[0,3.1,-0.2],7);
+const deskLamp=addLight(0xff9b42,13,[-1.05,2.1,-.5],3.8);
+const windowLight=addLight(0x42667a,4,[0,2.4,-4.6],6);
 
 // Small, oppressive office.
 box('floor',0,-.13,0,9,.25,10,'floor');
@@ -140,6 +152,10 @@ const ember=new THREE.Mesh(new THREE.SphereGeometry(.025,6,5),mats.ember);ember.
 const emberLight=new THREE.PointLight(0xff642b,0,2);emberLight.position.set(.45,-.3,-.7);camera.add(emberLight);
 handGroup.visible=false;
 
+// Drifting smoke wisps: low-cost translucent sprites that catch the lamp glow.
+const smokePuffs=[];const smokeMat=new THREE.MeshBasicMaterial({color:0x777b80,transparent:true,opacity:.055,depthWrite:false,side:THREE.DoubleSide});
+for(let i=0;i<24;i++){const puff=new THREE.Mesh(new THREE.PlaneGeometry(.45+Math.random()*.8,.5+Math.random()*.9),smokeMat.clone());puff.position.set(-1.05+(Math.random()-.5)*1.6,1.55+Math.random()*1.7,-1.55+(Math.random()-.5)*1.3);puff.rotation.z=Math.random()*Math.PI;puff.material.opacity=.025+Math.random()*.035;scene.add(puff);smokePuffs.push({mesh:puff,seed:Math.random()*10});}
+
 // Interaction targets.
 const photoTarget=new THREE.Mesh(new THREE.BoxGeometry(.5,.2,.45),new THREE.MeshBasicMaterial({visible:false}));photoTarget.position.set(-.55,1.2,-1.18);scene.add(photoTarget);
 const doorTarget=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.8,.5),new THREE.MeshBasicMaterial({visible:false}));doorTarget.position.set(0,1.45,4.65);scene.add(doorTarget);
@@ -167,20 +183,35 @@ let audioCtx=null,master=null,ambientStarted=false;
 function startAudio(){if(ambientStarted)return;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();master=audioCtx.createGain();master.gain.value=.16;master.connect(audioCtx.destination);const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.15;const noise=audioCtx.createBufferSource();noise.buffer=buffer;noise.loop=true;const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=480;const g=audioCtx.createGain();g.gain.value=.17;noise.connect(filter);filter.connect(g);g.connect(master);noise.start();const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=48;const og=audioCtx.createGain();og.gain.value=.08;osc.connect(og);og.connect(master);osc.start();ambientStarted=true;}catch(e){}}
 function playMatch(){if(!audioCtx)return;const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(1500,t);osc.frequency.exponentialRampToValueAtTime(180,t+.12);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);osc.connect(g);g.connect(master);osc.start(t);osc.stop(t+.18);}
 function unlock(){if(!started)return;renderer.domElement.requestPointerLock?.();}
-renderer.domElement.addEventListener('click',()=>{if(started&&$('dialogue').style.display!=='block')unlock();});
+renderer.domElement.addEventListener('click',()=>{if(started&&$('dialogue').style.display!=='block'&&matchMedia('(pointer:fine)').matches)unlock();});
+// Touch movement buttons hold their matching keyboard state; right-side dragging looks around.
+const touchUI=$('touchControls');
+for(const el of document.querySelectorAll('[data-key]')){
+ const code=el.dataset.key;
+ const down=e=>{e.preventDefault();keys[code]=true;el.style.background='#4b3826dd';};
+ const up=e=>{e.preventDefault();keys[code]=false;el.style.background='';};
+ el.addEventListener('pointerdown',down);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);
+}
+$('touchInteract').addEventListener('pointerdown',e=>{e.preventDefault();interact();});
+$('touchSmoke').addEventListener('pointerdown',e=>{e.preventDefault();toggleSmoke();});
+let lookPointer=null,lastTouchX=0,lastTouchY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!started)return;if(e.clientX<innerWidth*.38)return;lookPointer=e.pointerId;lastTouchX=e.clientX;lastTouchY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||e.pointerId!==lookPointer||!started)return;const dx=e.clientX-lastTouchX,dy=e.clientY-lastTouchY;lastTouchX=e.clientX;lastTouchY=e.clientY;yaw-=dx*.004;pitch=THREE.MathUtils.clamp(pitch-dy*.004,-1.2,1.15);});
+const endLook=e=>{if(e.pointerId===lookPointer)lookPointer=null;};renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement;});
 document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=THREE.MathUtils.clamp(pitch,-1.2,1.15);});
 document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='KeyF'&&!e.repeat)toggleSmoke();if(e.code==='Enter'&&$('dialogue').style.display==='block')$('continue').click();if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();});
 document.addEventListener('keyup',e=>keys[e.code]=false);
 $('smokeBtn').addEventListener('click',toggleSmoke);$('inspectBtn').addEventListener('click',interact);
-$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;startAudio();$('log').textContent='COLE (V.O.): “A man can drown in this city without ever touching the bay.”';$('objective').textContent='OBJECTIVE: ANSWER THE DOOR';renderer.domElement.requestPointerLock?.();});
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;if(matchMedia('(pointer:coarse), (max-width:700px)').matches)touchUI.classList.add('active');startAudio();$('log').textContent='COLE (V.O.): “A man can drown in this city without ever touching the bay.”';$('objective').textContent='OBJECTIVE: ANSWER THE DOOR';renderer.domElement.requestPointerLock?.();});
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();resizePS1();});
 const clampRoom=()=>{camera.position.x=THREE.MathUtils.clamp(camera.position.x,-4.05,4.05);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-4.45,4.45);camera.position.y=1.65;};
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);time+=dt;
   rainGeo.attributes.position.array.forEach((v,i)=>{if(i%6===1||i%6===4){rainGeo.attributes.position.array[i]-=dt*5;if(rainGeo.attributes.position.array[i]<-1)rainGeo.attributes.position.array[i]=8;}});
   rainGeo.attributes.position.needsUpdate=true;
   ceilingLamp.intensity=17+Math.sin(time*2.1)*.7+(Math.random()<.008?-6:0);
   windowLight.intensity=9+Math.sin(time*3.3)*1.3;
+  for(const p of smokePuffs){p.mesh.position.y+=dt*(.06+(p.seed%4)*.018);p.mesh.position.x+=Math.sin(time*.35+p.seed)*dt*.035;p.mesh.material.opacity=(.018+(.5+.5*Math.sin(time*.7+p.seed))*.025)*(smoking?1.6:1);p.mesh.lookAt(camera.position);if(p.mesh.position.y>3.25){p.mesh.position.y=1.45;p.mesh.position.x=-1.05+(Math.random()-.5)*1.5;}}
   if(started){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
     const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let dx=0,dz=0;
     if(keys.KeyW||keys.ArrowUp){dx+=forward.x;dz+=forward.z;}if(keys.KeyS||keys.ArrowDown){dx-=forward.x;dz-=forward.z;}if(keys.KeyA){dx-=right.x;dz-=right.z;}if(keys.KeyD){dx+=right.x;dz+=right.z;}
