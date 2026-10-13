@@ -7,7 +7,7 @@
 <style>
 :root{color-scheme:dark;--cyan:#a6c9d2;--amber:#e6a05a;--panel:rgba(7,10,14,.88)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#e9e1d5;font-family:Georgia,"Courier New",serif}
-canvas{display:block;position:fixed;inset:0;image-rendering:pixelated}
+canvas{display:block;position:fixed;inset:0;z-index:1;image-rendering:pixelated}
 #grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.22;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.48) 3px),radial-gradient(ellipse at center,transparent 22%,#000 100%);mix-blend-mode:multiply}
 #hud{position:fixed;inset:0;z-index:4;pointer-events:none;text-shadow:0 2px 5px #000}
 #mast{position:absolute;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:start;gap:12px}
