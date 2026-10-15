@@ -3,404 +3,111 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>CIG — Ash & Embers</title>
+<title>CIG — Zero District</title>
 <style>
-:root{color-scheme:dark;--cyan:#a6c9d2;--amber:#e6a05a;--panel:rgba(7,10,14,.88)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#e9e1d5;font-family:Georgia,"Courier New",serif}
-canvas{display:block;position:fixed;inset:0;z-index:1;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none}
-#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.22;background-image:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,.48) 3px),radial-gradient(ellipse at center,transparent 22%,#000 100%);mix-blend-mode:multiply}
-#hud{position:fixed;inset:0;z-index:4;pointer-events:none;text-shadow:0 2px 5px #000}
-#mast{position:absolute;top:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:start;gap:12px}
-#logo{font-family:"Courier New",monospace;font-size:19px;letter-spacing:.24em;font-weight:bold}#logo small{display:block;font-size:9px;letter-spacing:.17em;color:#b6a18a;margin-top:5px}
-#case{font-size:10px;line-height:1.8;letter-spacing:.12em;text-align:right;color:#b6c0c1}
-#chapter{position:absolute;top:95px;left:20px;max-width:330px;border-left:2px solid #c18b53;padding:9px 13px;background:linear-gradient(90deg,rgba(5,7,10,.82),transparent)}
-.kicker{font:10px "Courier New",monospace;letter-spacing:.18em;color:#e6ae70;margin-bottom:7px}#chapter h2{font-size:17px;font-weight:normal;margin:0 0 7px;letter-spacing:.04em}#chapter p{font-size:12px;line-height:1.55;color:#c3c0b9;margin:0}
-#crosshair{position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);opacity:.65}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#ded7c9}#crosshair:before{width:1px;height:15px;left:7px}#crosshair:after{height:1px;width:15px;top:7px}
-#hint{position:absolute;left:50%;top:calc(50% + 28px);transform:translateX(-50%);font:10px "Courier New",monospace;letter-spacing:.1em;color:#f1d8b5;white-space:nowrap}
-#bottom{position:absolute;bottom:17px;left:19px;right:19px;display:flex;justify-content:space-between;align-items:end;gap:10px}
-#log{font-size:10px;line-height:1.8;letter-spacing:.06em;color:#b7b6b0;background:rgba(5,7,10,.78);border:1px solid #aab7b522;padding:8px 11px;max-width:65vw}
-#actions{pointer-events:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}button{font:10px "Courier New",monospace;letter-spacing:.08em;color:#e8dfd1;background:#121417eF;border:1px solid #aa9b8355;padding:10px 12px;cursor:pointer}button:hover{background:#34271e;border-color:#d6a56b}button:focus-visible{outline:2px solid #e6ae70}
-#dialogue{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);width:min(680px,calc(100vw - 28px));background:linear-gradient(135deg,rgba(7,8,10,.97),rgba(17,16,16,.94));border:1px solid #b08a5c88;padding:17px 19px;display:none;pointer-events:auto;box-shadow:0 12px 45px #000}
-#speaker{font:10px "Courier New",monospace;color:#e6ae70;letter-spacing:.2em;margin-bottom:9px}#line{font-size:15px;line-height:1.65;color:#eee5d7}#continue{float:right;margin-top:12px}
-#overlay{position:fixed;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(4,5,8,.68),rgba(4,5,8,.93)),radial-gradient(ellipse at 50% 40%,#43342a,#07090e 72%);padding:20px}
-#card{max-width:650px;width:100%;border:1px solid #b38a5b77;background:rgba(8,9,12,.92);padding:clamp(22px,5vw,48px);box-shadow:0 25px 100px #000}
-#card .eyebrow{font:10px "Courier New",monospace;letter-spacing:.3em;color:#dba568}#card h1{font-size:clamp(38px,8vw,68px);font-weight:normal;letter-spacing:.08em;margin:14px 0 4px}#card h1 span{color:#c58d54}#card h2{font:12px "Courier New",monospace;font-weight:normal;letter-spacing:.22em;color:#b8b3a8;margin:0 0 25px}#card p{color:#c7c0b5;font-size:14px;line-height:1.7}#start{margin-top:14px;background:#b98450;color:#100d0a;border:0;padding:13px 20px;font-weight:bold}#start:hover{background:#e1b27a}#card .small{font:10px "Courier New",monospace;line-height:1.8;color:#928e87;margin-top:19px}
-#smoke{position:absolute;right:20px;top:50%;transform:translateY(-50%);font:10px "Courier New",monospace;letter-spacing:.12em;color:#e6c7a2;text-align:right}#smoke b{display:block;font-size:18px;font-weight:normal;margin-top:4px}
-#fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:7;transition:opacity 1.5s}
-/* Touch HUD: translucent, diegetic controls that stay clear of dialogue. */
-#touchControls{display:none;position:fixed;inset:0;z-index:20;pointer-events:none;touch-action:none;font:11px 'Courier New',monospace;color:#e6d7c4}
-#movePad{position:absolute;z-index:21;left:16px;bottom:24px;display:grid;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px;gap:4px;pointer-events:auto}
-.touchKey{display:flex;align-items:center;justify-content:center;border:1px solid #c9b79a66;background:#090b0dbb;border-radius:5px;user-select:none;-webkit-user-select:none;touch-action:none;font-size:17px;box-shadow:inset 0 0 16px #0008}
-#keyW{grid-column:2;grid-row:1}#keyA{grid-column:1;grid-row:2}#keyS{grid-column:2;grid-row:2}#keyD{grid-column:3;grid-row:2}
-#touchActions{position:absolute;z-index:21;right:16px;bottom:27px;display:flex;flex-direction:column;gap:9px;pointer-events:auto}
-#touchActions .touchKey{width:68px;height:58px;font-size:10px;letter-spacing:.05em;border-radius:50%;background:#100e0bd9;border-color:#d5a46b77}
-#lookLabel{position:absolute;right:95px;bottom:15px;font-size:9px;opacity:.52;letter-spacing:.12em;pointer-events:none}
-@media(pointer:coarse),(max-width:700px){#touchControls.active{display:block}#bottom{bottom:8px;left:10px;right:10px}#actions{display:none}#log{max-width:60vw;font-size:8px;padding:6px}#smoke{display:none}#chapter{top:75px;left:12px;padding:7px 10px;max-width:calc(100vw - 24px)}#chapter p{font-size:11px;max-width:250px}#mast{top:12px;left:12px;right:12px}#logo{font-size:16px}#case{font-size:7px}#dialogue{bottom:150px;padding:13px;width:calc(100vw - 24px)}#line{font-size:13px}#hint{top:calc(50% + 22px);font-size:9px}#crosshair{opacity:.45}#card p{font-size:13px}}
-@media(max-width:600px){#chapter{top:105px;max-width:calc(100vw - 40px)}#case{font-size:8px}#log{max-width:52vw;font-size:9px}button{padding:9px 8px;font-size:9px}#smoke{top:auto;bottom:110px;right:15px}#dialogue{bottom:105px}}
+:root{color-scheme:dark;--cyan:#20dfff;--blue:#168dff;--red:#ff244e;--panel:rgba(2,9,20,.82)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030711;color:#d9f7ff;font-family:"Courier New",monospace}canvas{display:block;position:fixed;inset:0;touch-action:none;image-rendering:pixelated}
+#grain{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#0005 4px),radial-gradient(ellipse at center,transparent 40%,#000c 100%);mix-blend-mode:multiply;opacity:.48}
+#hud{position:fixed;inset:0;z-index:3;pointer-events:none;text-shadow:0 2px 5px #000}
+#objective{position:absolute;top:20px;left:22px;color:var(--cyan);font-size:13px;line-height:1.6;letter-spacing:.04em;background:linear-gradient(90deg,#03101ee8,transparent);padding:7px 18px 8px 10px;border-left:2px solid var(--cyan);max-width:min(390px,72vw)}
+#objective strong{color:#ffe52d}#brand{position:absolute;top:22px;left:50%;transform:translateX(-50%);text-align:center;font-weight:bold;letter-spacing:.3em;color:#dffaff;font-size:14px}#brand small{display:block;color:#5ab8d8;font-size:8px;letter-spacing:.25em;margin-top:5px}
+#map{position:absolute;right:20px;top:18px;width:146px;height:146px;border:1px solid #11c9ff;background:#041526cc;box-shadow:0 0 15px #00aaff22}#map canvas{position:static;width:100%;height:100%}
+#crosshair{position:absolute;left:50%;top:50%;width:16px;height:16px;transform:translate(-50%,-50%);opacity:.9}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#b8faff;box-shadow:0 0 5px #00cfff}#crosshair:before{width:1px;height:16px;left:7px}#crosshair:after{height:1px;width:16px;top:7px}
+#hint{position:absolute;left:50%;top:calc(50% + 24px);transform:translateX(-50%);color:#7eeaff;font-size:11px;white-space:nowrap}
+#status{position:absolute;bottom:22px;left:20px;display:flex;align-items:end;gap:10px;background:#04101bd9;border:1px solid #16cfff66;padding:9px 12px}#bodyIcon{width:42px;height:72px;border:1px solid #20dfff66;position:relative;display:grid;place-items:center;color:#1edbff;font-size:25px}#bars{width:190px;font-size:11px} .barline{display:flex;align-items:center;gap:7px;margin:6px 0}.bar{height:11px;width:150px;border:1px solid #15d7ff77;background:#07121c}.fill{height:100%;background:#ff294c;width:100%}.shield{background:#0ba9e9;width:75%}
+#weaponStats{position:absolute;right:20px;bottom:20px;display:flex;align-items:center;gap:9px;background:#04101bd9;border:1px solid #12d4ff77;padding:10px 13px;color:#bff7ff}#weaponIcon{font-size:30px;color:#20dfff}#ammo{font-size:23px}#ammo small{font-size:11px;color:#5dcbe8}
+#controls{position:absolute;right:22px;bottom:130px;font-size:12px;line-height:2;color:#26dfff;text-align:left}#controls span{display:inline-block;border:1px solid #1bdfff99;min-width:23px;text-align:center;margin-right:7px;padding:0 3px}
+#toast{position:absolute;bottom:120px;left:50%;transform:translateX(-50%);padding:8px 12px;background:#03111fe0;border:1px solid #14cfff66;color:#baf6ff;font-size:11px;display:none;max-width:85vw;text-align:center}
+#overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#030711e8,#050b19ed),radial-gradient(ellipse at 50% 40%,#09355b,#02040a);padding:20px}
+#card{width:min(650px,100%);padding:clamp(24px,5vw,48px);background:#030914eF;border:1px solid #16cfff88;box-shadow:0 0 60px #007cff22}
+.eyebrow{color:#ff315c;font-size:10px;letter-spacing:.32em}h1{font-size:clamp(43px,9vw,82px);line-height:.9;margin:20px 0 10px;letter-spacing:.04em;color:#e8fbff;text-shadow:4px 3px #072c5c}h1 em{font-style:normal;color:#17dfff}h2{font-size:12px;letter-spacing:.2em;font-weight:normal;color:#38c9ff}#card p{font-family:Arial,sans-serif;color:#b4c7d9;font-size:14px;line-height:1.65}button{font-family:inherit;cursor:pointer;background:#00bce9;color:#00101a;border:0;padding:13px 19px;font-weight:bold;letter-spacing:.1em}button:hover{background:#8af1ff}#start{margin-top:10px}.small{color:#5b8ba7;font-size:9px;line-height:1.9;margin-top:18px}
+#touch{display:none;position:fixed;inset:0;z-index:5;pointer-events:none;font-size:11px;color:#d6faff}#pad{position:absolute;left:15px;bottom:18px;display:grid;grid-template-columns:43px 43px 43px;grid-template-rows:43px 43px 43px;gap:4px;pointer-events:auto} .key{display:flex;align-items:center;justify-content:center;background:#03101dcc;border:1px solid #21dfff77;border-radius:5px;touch-action:none;user-select:none;font-size:16px}#up{grid-column:2;grid-row:1}#left{grid-column:1;grid-row:2}#down{grid-column:2;grid-row:2}#right{grid-column:3;grid-row:2}#touchActions{position:absolute;right:15px;bottom:25px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}#touchActions .key{width:66px;height:58px;font-size:10px;border-radius:50%}
+@media(pointer:coarse),(max-width:700px){#touch.active{display:block}#map{width:100px;height:100px;right:10px;top:10px}#brand{display:none}#objective{top:10px;left:10px;font-size:10px;max-width:65vw}#controls{display:none}#status{left:10px;bottom:10px;padding:6px}#bodyIcon{width:30px;height:49px;font-size:18px}#bars{width:115px;font-size:9px}.bar{width:82px;height:8px}#weaponStats{right:10px;bottom:10px;padding:7px}#weaponIcon{font-size:21px}#ammo{font-size:17px}#hint{top:57%;font-size:9px}#toast{bottom:100px}}
 </style>
 </head>
 <body>
 <div id="grain"></div>
 <div id="hud">
-  <div id="mast"><div id="logo">CIG <small>AN INTERACTIVE NOIR</small></div><div id="case">PRIVATE ENQUIRIES<br>CASE FILE 001 — THE RETAINER</div></div>
-  <section id="chapter"><div class="kicker">ACT I · THE OFFICE OF LOST SOULS</div><h2 id="chapterTitle">The Retainer</h2><p id="chapterText">Midnight. A storm works the windows like a debt collector. Someone is waiting outside your office.</p><div id="objective" class="kicker" style="margin-top:10px;margin-bottom:0">OBJECTIVE: ANSWER THE DOOR</div></section>
-  <div id="crosshair"></div><div id="hint"></div><div id="smoke">SMOKE METER<b id="smokeValue">STEADY</b></div>
-  <div id="bottom"><div id="log">WASD MOVE · MOUSE LOOK · E INTERACT · F LIGHT CIGARETTE · ESC RELEASE MOUSE</div><div id="actions"><button id="smokeBtn">F · LIGHT MATCH</button><button id="inspectBtn">E · INSPECT</button></div></div>
-  <div id="dialogue"><div id="speaker">COLE</div><div id="line"></div><button id="continue">CONTINUE ↵</button><div id="endingChoices" style="display:none;clear:both;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:14px"><button id="sealEnding">SEAL THE GATE</button><button id="openEnding">OPEN THE GATE</button></div></div>
+ <div id="objective">CURRENT OBJECTIVE:<br><strong>◇ Find the missing contact</strong><br>&nbsp;&nbsp;› Check the bar in District Zero</div>
+ <div id="brand">ZERO DISTRICT<small>NEON NEVER FORGETS</small></div>
+ <canvas id="map" width="146" height="146"></canvas>
+ <div id="crosshair"></div><div id="hint">WALK THE DISTRICT · LOOK FOR THE RED BAR SIGN</div>
+ <div id="status"><div id="bodyIcon">♙</div><div id="bars"><div>VITALS <b id="hpText">100</b></div><div class="barline"><div class="bar"><div class="fill" id="hpFill"></div></div></div><div>ARMOR <b id="armorText">75</b></div><div class="barline"><div class="bar"><div class="fill shield" id="armorFill"></div></div></div></div></div>
+ <div id="weaponStats"><div id="weaponIcon">▰</div><div><div id="ammo">12 <small>/ 48</small></div><div style="font-size:9px;color:#4cbad7">K-9 SIDEARM</div></div></div>
+ <div id="controls"><div><span>E</span>Talk</div><div><span>F</span>Hack</div><div><span>I</span>Inventory</div><div><span>M</span>Map</div><div><span>R</span>Reload</div></div>
+ <div id="toast"></div>
 </div>
-<div id="fade"></div>
-<div id="touchControls" aria-label="Touch game controls"><div id="movePad"><div class="touchKey" id="keyW" data-key="KeyW">▲</div><div class="touchKey" id="keyA" data-key="KeyA">◀</div><div class="touchKey" id="keyS" data-key="KeyS">▼</div><div class="touchKey" id="keyD" data-key="KeyD">▶</div></div><div id="touchActions"><div class="touchKey" id="touchInteract">INTERACT</div><div class="touchKey" id="touchSmoke">MATCH</div></div><div id="lookLabel">DRAG RIGHT SIDE TO LOOK</div></div>
-<div id="overlay"><div id="card"><div class="eyebrow">A CIG INTERACTIVE STORY</div><h1>ASH <span>&</span><br>EMBERS</h1><h2>A DETECTIVE STORY IN THE FLOODED BASIN</h2><p>A city can drown a man without ever touching the bay. Tonight, someone has brought you a photograph, an iron key, and a story that doesn't quite add up.</p><p>Explore Cole’s office, follow the red lamps to Pier 14, search Warehouse 19, and descend into the drainage cathedral beneath the city. Meet Iris and Clara Vance, the Harbor Warden, and the thing that learned to speak with the dead. Your final choice will decide what the Basin remembers.</p><button id="start">ENTER THE OFFICE</button><div class="small">WASD TO MOVE · MOUSE TO LOOK · E TO INTERACT · F TO LIGHT A MATCH<br>FOUR CHAPTERS · TWO ENDINGS · AUDIO STARTS AFTER YOU ENTER</div></div></div>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"}}
-</script>
+<div id="touch" aria-label="Touch controls"><div id="pad"><div class="key" id="up" data-key="KeyW">▲</div><div class="key" id="left" data-key="KeyA">◀</div><div class="key" id="down" data-key="KeyS">▼</div><div class="key" id="right" data-key="KeyD">▶</div></div><div id="touchActions"><div class="key" id="talk">TALK</div><div class="key" id="hack">HACK</div><div class="key" id="reload">RELOAD</div></div></div>
+<div id="overlay"><div id="card"><div class="eyebrow">CIG PRESENTS · INTERACTIVE PROTOTYPE</div><h1>ZERO<br><em>DISTRICT</em></h1><h2>RAIN CITY · SECTOR 09 · 03:17 AM</h2><p>The city sells immortality one subscription at a time. Your last contact vanished after finding a hole in the corporation's memory archive. Find the red-lit bar, ask for Moth, and don't trust anyone whose eyes glow blue.</p><p>Explore a neon-soaked street, inspect the environment, speak to a contact, and hack a street terminal. This is a playable visual foundation for a larger cyberpunk RPG.</p><button id="start">ENTER DISTRICT ZERO ↗</button><div class="small">WASD MOVE · MOUSE LOOK · E INTERACT · F HACK · R RELOAD<br>MOBILE: LEFT PAD TO MOVE · DRAG THE SCENE TO LOOK</div></div></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
-
-const $ = id => document.getElementById(id);
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x090d12);
-scene.fog = new THREE.FogExp2(0x101725, 0.061);
-const camera = new THREE.PerspectiveCamera(66, innerWidth/innerHeight, 0.08, 65);
-camera.position.set(0,1.65,4.6);
-const renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance'});
-// Intentionally render at a small internal resolution for a late-PS1 look.
-const ps1Scale = 0.52;
-function resizePS1(){renderer.setPixelRatio(1);renderer.setSize(Math.max(320,Math.floor(innerWidth*ps1Scale)),Math.max(200,Math.floor(innerHeight*ps1Scale)),false);renderer.domElement.style.width='100vw';renderer.domElement.style.height='100dvh';}
-resizePS1();
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.02;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.body.appendChild(renderer.domElement);
-
-const mats = {};
-function mat(name,color,roughness=1,opts={}){return mats[name]=new THREE.MeshStandardMaterial({color,roughness,...opts});}
-mat('wall',0x41485f);mat('wallDark',0x171b2b);mat('floor',0x352d3a);mat('wood',0x563022);mat('woodTop',0x75452a);mat('metal',0x3d5366,.65,{metalness:.65});mat('brass',0xc18a3f,.45,{metalness:.65});mat('paper',0xd8c39a);mat('paperDark',0x9a7654);mat('glass',0x1b3b50,.2,{metalness:.3});mat('coat',0x4c6557);mat('skin',0xc18a70);mat('ink',0x292637);mat('cig',0xe1d8c3);mat('ember',0xff5d16,.45,{emissive:0xff3200,emissiveIntensity:3.2});
-function box(name,x,y,z,sx,sy,sz,material,cast=true,receive=true){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),typeof material==='string'?mats[material]:material);o.name=name;o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=receive;scene.add(o);return o;}
-function cylinder(name,x,y,z,r1,r2,h,material,seg=8,rotX=0){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,seg),mats[material]);o.name=name;o.position.set(x,y,z);o.rotation.x=rotX;o.castShadow=true;scene.add(o);return o;}
-function addLight(color,intensity,pos,dist=12){const l=new THREE.PointLight(color,intensity,dist,2);l.position.set(...pos);scene.add(l);return l;}
-
-scene.add(new THREE.HemisphereLight(0x879ac7,0x21101a,0.72));
-const ceilingLamp=addLight(0xffb45e,11,[0,3.1,-0.2],7.5);
-const deskLamp=addLight(0xff8c32,22,[-1.05,2.1,-.5],4.2);
-const windowLight=addLight(0x3f91c2,7,[0,2.4,-4.6],7);
-
-// Small, oppressive office.
-box('floor',0,-.13,0,9,.25,10,'floor');
-box('ceiling',0,3.5,0,9,.2,10,'wallDark');
-box('back wall',0,1.7,-4.9,9,3.5,.2,'wall');
-box('left wall',-4.4,1.7,0,.2,3.5,10,'wall');
-box('right wall',4.4,1.7,0,.2,3.5,10,'wall');
-box('front wall left',-3.15,1.7,4.9,2.5,3.5,.2,'wall');
-box('front wall right',3.15,1.7,4.9,2.5,3.5,.2,'wall');
-box('front lintel',0,3.05,4.9,3.8,.8,.2,'wall');
-for(let x=-4;x<4;x+=.6) box('floorboard',x,-.001,0,.012,.008,9,'wood',false,false);
-
-// Rain window and frame.
-box('window recess',0,2.15,-4.77,3.2,1.8,.08,'wallDark');
-box('window glass',0,2.15,-4.70,2.95,1.58,.035,'glass',false,false);
-for(const x of [-1.53,0,1.53]) box('window mullion',x,2.15,-4.65,.06,1.68,.09,'wood');
-box('window crossbar',0,2.15,-4.64,3.0,.055,.09,'wood');
-box('window sill',0,1.28,-4.55,3.25,.12,.3,'woodTop');
-const city=new THREE.Group();scene.add(city);
-for(let i=0;i<24;i++){const x=(Math.random()-.5)*22,z=-8-Math.random()*8,h=.5+Math.random()*4;const b=new THREE.Mesh(new THREE.BoxGeometry(.45+Math.random()*.9,h,.45),new THREE.MeshStandardMaterial({color:0x142a42,roughness:1}));b.position.set(x,h/2-0.1,z);city.add(b);for(let j=0;j<4;j++){const w=new THREE.Mesh(new THREE.BoxGeometry(.04,.05,.01),new THREE.MeshBasicMaterial({color:Math.random()>.5?0xb17848:0x4e7387}));w.position.set(x+(Math.random()-.5)*.5,Math.random()*h,z+.23);city.add(w)}}
-
-// Rain streaks outside the glass.
-const rainGeo=new THREE.BufferGeometry();const rainCount=650;const rainPositions=new Float32Array(rainCount*6);
-for(let i=0;i<rainCount;i++){const x=(Math.random()-.5)*15,y=Math.random()*9,z=-4.2-Math.random()*9;const k=i*6;rainPositions[k]=x;rainPositions[k+1]=y;rainPositions[k+2]=z;rainPositions[k+3]=x-.05;rainPositions[k+4]=y-.24;rainPositions[k+5]=z;}
-rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x67bce8,transparent:true,opacity:.42}));scene.add(rain);
-
-// Desk, clutter, ashtray and case evidence.
-box('desk body',0,0.86,-1.35,3.5,.22,1.55,'wood');
-box('desk front',0,.47,-.67,3.5,.65,.13,'wood');
-for(const x of [-1.48,1.48])for(const z of [-1.9,-.82])box('desk leg',x,.39,z,.13,.78,.13,'wood');
-box('desk blotter',0,1.0,-1.35,2.5,.035,1.05,'ink');
-for(let i=0;i<7;i++){const p=box('eviction notice',-1.05+(i%3)*.47,1.045,-1.42+Math.floor(i/3)*.29,.43,.012,.26,i%2?'paper':'paperDark',false);p.rotation.y=(Math.random()-.5)*.24;p.rotation.z=(Math.random()-.5)*.08;}
-const ashtray=cylinder('ashtray',.78,1.08,-1.05,.23,.2,.07,'metal',12);
-for(let i=0;i<5;i++){const a=cylinder('crushed cigarette',.75+(Math.random()-.5)*.22,1.13,-1.05+(Math.random()-.5)*.18,.025,.025,.22,'paper',6,Math.PI/2);a.rotation.z=Math.random()*.3;}
-const bourbon=cylinder('bottle',1.35,1.28,-1.72,.13,.1,.46,'brass',7);cylinder('bottle neck',1.35,1.55,-1.72,.055,.055,.13,'wood',7);
-box('photo',-.55,1.075,-1.18,.34,.015,.25,'paper',false).rotation.y=-.13;
-box('photo image',-.55,1.085,-1.18,.26,.006,.16,'wallDark',false).rotation.y=-.13;
-// Desk lamp.
-cylinder('lamp base',-1.08,1.08,-1.55,.22,.22,.06,'brass',10);
-cylinder('lamp stem',-1.08,1.38,-1.55,.035,.035,.55,'brass',8);
-const shade=new THREE.Mesh(new THREE.ConeGeometry(.27,.25,8,1,true),mats.brass);shade.position.set(-1.08,1.69,-1.55);shade.rotation.x=Math.PI;scene.add(shade);
-box('filing cabinet',-3.45,.72,-2.3,.75,1.45,.85,'wallDark');
-for(let y=.3;y<1.35;y+=.32){box('drawer',-3.45,y,-1.86,.65,.27,.04,'metal');box('drawer handle',-3.45,y,-1.82,.19,.035,.025,'brass');}
-box('bookcase',3.55,1.25,-3.5,.7,2.5,.5,'wood');
-for(let y=.45;y<2.5;y+=.55){box('shelf',3.55,y,-3.5,.72,.06,.54,'woodTop');for(let j=0;j<4;j++)box('book',3.32+j*.13,y+.17,-3.51,.09,.28,.35,['coat','paperDark','metal','woodTop'][j]);}
-// Door and frosted glass sign.
-const door=box('office door',0,1.45,4.78,1.42,2.8,.13,'wood');
-box('frosted glass',0,2.02,4.69,1.18,.64,.025,'glass',false,false);
-box('door sign',0,2.02,4.665,.88,.28,.018,'paperDark',false,false);
-const knob=cylinder('brass knob',.48,1.35,4.64,.07,.07,.08,'brass',8,Math.PI/2);
-for(let i=0;i<3;i++)box('door panel',0,.55+i*.66,4.69,1.03,.49,.025,'woodTop',false);
-
-// Low-poly coat stand and raincoat.
-cylinder('coat stand base',-3.2,.12,.4,.26,.26,.12,'metal',8);
-cylinder('coat stand pole',-3.2,1.1,.4,.045,.045,1.9,'metal',8);
-cylinder('coat stand hook',-3.2,2.08,.4,.045,.045,.55,'metal',8,Math.PI/2);
-const coat=box('hanging coat',-3.12,1.35,.4,.5,.95,.22,'coat');coat.rotation.z=-.07;
-
-// First-person hand, cigarette and match.
-const handGroup=new THREE.Group();camera.add(handGroup);scene.add(camera);
-const hand= new THREE.Mesh(new THREE.BoxGeometry(.22,.17,.32),mats.skin);hand.position.set(.42,-.39,-.62);hand.rotation.x=-.15;handGroup.add(hand);
-const cig= new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.32,6),mats.cig);
-// CylinderGeometry runs along local Y. Rotate -90 degrees so its positive end points toward screen-right, where the ember sits.
-cig.rotation.z=-Math.PI/2;cig.position.set(.31,-.32,-.78);handGroup.add(cig);
-const ember=new THREE.Mesh(new THREE.SphereGeometry(.025,6,5),mats.ember);ember.position.set(.47,-.32,-.78);handGroup.add(ember);
-const cigBand=new THREE.Mesh(new THREE.CylinderGeometry(.019,.019,.035,6),new THREE.MeshStandardMaterial({color:0x9b5a35,roughness:1}));cigBand.rotation.z=-Math.PI/2;cigBand.position.set(.18,-.32,-.78);handGroup.add(cigBand);
-// Individual cigarette smoke puffs are parented to the cigarette hand, so they follow the ember in first person.
-const cigSmoke=[];const cigSmokeMat=new THREE.MeshBasicMaterial({color:0xc7d4df,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
-for(let i=0;i<9;i++){const puff=new THREE.Mesh(new THREE.PlaneGeometry(.09,.12),cigSmokeMat.clone());puff.position.set(.48,-.27,-.78);puff.visible=false;handGroup.add(puff);cigSmoke.push({mesh:puff,life:Math.random(),seed:Math.random()*8});}
-const emberLight=new THREE.PointLight(0xff642b,0,2);emberLight.position.set(.45,-.3,-.7);camera.add(emberLight);
-handGroup.visible=false;
-
-// Low-poly characters: Iris Vance in a rain-darkened coat and a lurking Basin watcher.
-function addCharacterPart(group,geometry,color,pos,scale=[1,1,1],rotation={x:0,y:0,z:0}){const m=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(...pos);m.scale.set(...scale);m.rotation.set(rotation.x,rotation.y,rotation.z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
-function makeIris(){const g=new THREE.Group();
- addCharacterPart(g,new THREE.CylinderGeometry(.19,.28,.92,6),0x344b53,[0,1.05,0],[1,1,1],{z:-.035});
- addCharacterPart(g,new THREE.BoxGeometry(.48,.48,.16),0x526a68,[0,1.16,.015],[1,1,1],{z:-.04});
- addCharacterPart(g,new THREE.SphereGeometry(.22,7,6),0xc48c70,[0,1.78,0],[.82,1.05,.8]);
- addCharacterPart(g,new THREE.SphereGeometry(.235,7,5),0x29232b,[0,1.91,-.015],[1.03,.72,.95]);
- addCharacterPart(g,new THREE.BoxGeometry(.1,.52,.13),0x29232b,[-.19,1.64,-.005],[1,1,1],{z:-.12});
- addCharacterPart(g,new THREE.BoxGeometry(.1,.52,.13),0x29232b,[.19,1.64,-.005],[1,1,1],{z:.12});
- addCharacterPart(g,new THREE.SphereGeometry(.035,5,4),0x202d3b,[-.075,1.79,.17],[1,1,.55]);
- addCharacterPart(g,new THREE.SphereGeometry(.035,5,4),0x202d3b,[.075,1.79,.17],[1,1,.55]);
- addCharacterPart(g,new THREE.BoxGeometry(.1,.62,.12),0x344b53,[-.28,1.08,0],[1,1,1],{z:-.12});addCharacterPart(g,new THREE.BoxGeometry(.1,.62,.12),0x344b53,[.28,1.08,0],[1,1,1],{z:.12});
- addCharacterPart(g,new THREE.BoxGeometry(.17,.56,.19),0x262b36,[-.12,.31,0],[1,1,1]);addCharacterPart(g,new THREE.BoxGeometry(.17,.56,.19),0x262b36,[.12,.31,0],[1,1,1]);
- // A little satchel catches the amber light.
- addCharacterPart(g,new THREE.BoxGeometry(.25,.25,.12),0x8a5833,[.33,.88,.08],[1,1,1],{z:-.12});g.position.set(0,0,3.65);g.visible=false;scene.add(g);return g;}
-const iris=makeIris();
-function makeWatcher(){const g=new THREE.Group();addCharacterPart(g,new THREE.ConeGeometry(.48,1.35,5),0x343b42,[0,1.15,0]);addCharacterPart(g,new THREE.SphereGeometry(.22,6,5),0x1a2029,[0,1.95,0],[.9,1,.8]);addCharacterPart(g,new THREE.BoxGeometry(.08,.07,.035),0xffaa37,[-.07,1.98,.18],[1,1,1]);addCharacterPart(g,new THREE.BoxGeometry(.08,.07,.035),0xffaa37,[.07,1.98,.18],[1,1,1]);g.position.set(1.6,0,-4.2);g.visible=false;scene.add(g);return g;}
-const watcher=makeWatcher();
-function makeClara(){const g=new THREE.Group();addCharacterPart(g,new THREE.ConeGeometry(.31,.9,6),0x8b394a,[0,.83,0]);addCharacterPart(g,new THREE.SphereGeometry(.18,7,6),0xc99a83,[0,1.53,0],[.86,1,.8]);addCharacterPart(g,new THREE.SphereGeometry(.19,7,5),0x251c2b,[0,1.65,-.015],[1.05,.72,.95]);addCharacterPart(g,new THREE.BoxGeometry(.07,.4,.1),0x251c2b,[-.15,1.4,-.005],[1,1,1],{z:-.15});addCharacterPart(g,new THREE.BoxGeometry(.07,.4,.1),0x251c2b,[.15,1.4,-.005],[1,1,1],{z:.15});addCharacterPart(g,new THREE.SphereGeometry(.055,5,4),0xd8b35a,[0,1.1,.15],[1,1,.65]);g.position.set(0,.05,-4.15);g.visible=false;scene.add(g);return g;}
-
-const clara=makeClara();
-
-// Full playable follow-up chapters. Each chapter is built from low-poly Three.js
-// geometry and placed in its own district of the same world.
-let currentLevel=0;
-const levelGroups=[];
-function levelBox(g,name,x,y,z,sx,sy,sz,color,opts={}){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true,...opts}));m.name=name;m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;}
-function levelCylinder(g,x,y,z,r1,r2,h,color,segments=7){const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true}));m.position.set(x,y,z);m.castShadow=true;g.add(m);return m;}
-function levelCharacter(g,x,y,z,kind='worker'){
- const c=new THREE.Group(), coat=kind==='warden'?0x5a3c31:kind==='clara'?0x8e334c:0x354b52;
- addCharacterPart(c,new THREE.CylinderGeometry(.18,.27,.9,6),coat,[0,.95,0]);
- addCharacterPart(c,new THREE.SphereGeometry(.2,7,6),kind==='clara'?0xb88976:0xb27e64,[0,1.63,0],[.85,1,.8]);
- addCharacterPart(c,new THREE.SphereGeometry(.22,7,5),kind==='clara'?0x251a2b:0x25232a,[0,1.76,-.02],[1.04,.72,.92]);
- addCharacterPart(c,new THREE.BoxGeometry(.09,.48,.12),coat,[-.24,.96,0],[1,1,1],{z:-.1});
- addCharacterPart(c,new THREE.BoxGeometry(.09,.48,.12),coat,[.24,.96,0],[1,1,1],{z:.1});
- if(kind==='warden'){addCharacterPart(c,new THREE.ConeGeometry(.23,.28,5),0x26252b,[0,1.91,0]);addCharacterPart(c,new THREE.BoxGeometry(.12,.045,.04),0xe0a447,[-.06,1.65,.16]);}
- c.position.set(x,y,z);g.add(c);return c;
-}
-function buildDockLevel(){
- const g=new THREE.Group();g.position.x=20;scene.add(g);levelGroups.push(g);
- const wood=0x5b3b31,wet=0x273b49,metal=0x52616a;
- levelBox(g,'pier water',0,-.7,-7,18,.2,22,0x102b42);
- levelBox(g,'pier deck',0,-.05,-2,7,.25,13,wood);
- for(let x=-3;x<=3;x+=1.5)for(let z=-7;z<=3;z+=2.4)levelCylinder(g,x,-.75,z,.15,.22,1.6,0x302b31,5);
- for(const x of [-3.35,3.35]){levelBox(g,'dock rail',x,.45,-2,.12,.12,11,metal);for(let z=-7;z<=3;z+=1.5)levelBox(g,'rail post',x,.2,z,.12,.8,.12,wood);}
- for(let i=0;i<7;i++){const b=levelBox(g,'warehouse silhouettes',-8+i*2.5,1.1,-11,1.4,2.4,.8,i%2?0x263342:0x3b2d36);levelBox(g,'lit windows',-8+i*2.5,1.2,-10.55,.2,.35,.04,i%3?0x9a623e:0x39758b,{emissive:i%3?0x6e2c13:0x16394d,emissiveIntensity:.7});}
- for(const z of [-6,-1,4]){levelCylinder(g,-2.5,.9,z,.07,.07,1.8,0x41454b);const bulb=new THREE.Mesh(new THREE.SphereGeometry(.13,6,5),new THREE.MeshBasicMaterial({color:0xffa34f}));bulb.position.set(-2.5,1.78,z);g.add(bulb);const l=new THREE.PointLight(0xff843b,3,5);l.position.set(-2.5,1.7,z);g.add(l);}
- levelCharacter(g,1.7,0,-2,'warden');
- const crate=levelBox(g,'pier crate',1.8,.35,-5,.9,.7,.8,0x55402f);crate.rotation.y=.3;
- return g;
-}
-function buildWarehouseLevel(){
- const g=new THREE.Group();g.position.x=40;scene.add(g);levelGroups.push(g);
- levelBox(g,'warehouse floor',0,-.18,-3,15,.3,18,0x3d3539);
- levelBox(g,'warehouse rear wall',0,3,-12,15,6,.3,0x343844);
- for(const x of [-7.3,7.3])levelBox(g,'warehouse side wall',x,3,-3,.3,6,18,0x272e3b);
- levelBox(g,'warehouse roof',0,6,-3,15,.25,18,0x202632);
- for(let x=-6;x<=6;x+=3){levelBox(g,'iron beam',x,4.8,-3,.16,.2,18,0x5a4c4a);levelBox(g,'hanging chain',x,3.5,-4,.035,2.5,.035,0x899098);}
- for(let i=0;i<9;i++){const x=-5.8+(i%3)*2.3,z=-8+Math.floor(i/3)*2.5;levelBox(g,'cargo crate',x,.75,z,1.6,1.5,1.5,[0x61412f,0x3b4a4e,0x684b38][i%3]);for(const y of [.25,1.15])levelBox(g,'crate band',x,y,z+.76,1.62,.07,.04,0x8c6b42);}
- // A huge iron hatch, the route beneath the warehouse.
- levelCylinder(g,0,.03,-9.1,1.5,1.5,.12,0x242b32,12);
- for(let i=0;i<8;i++){const a=i*Math.PI/4;levelBox(g,'hatch spokes',Math.cos(a)*.8,.12,-9.1+Math.sin(a)*.8,1.55,.06,.08,0x65717a).rotation.y=-a;}
- const hangingLamp=new THREE.PointLight(0xff6b39,5,9);hangingLamp.position.set(0,4.2,-3);g.add(hangingLamp);
- levelCharacter(g,-2,0,-6,'clara');
- levelCharacter(g,3,0,-9,'warden');
- return g;
-}
-function buildCathedralLevel(){
- const g=new THREE.Group();g.position.x=60;scene.add(g);levelGroups.push(g);
- levelBox(g,'flooded cathedral water',0,-.42,-4,16,.12,20,0x153c51,{metalness:.2,roughness:.25});
- for(const x of [-6,-3,0,3,6]){levelCylinder(g,x,2.3,-4,.18,.3,4.6,0x55515a,5);levelCylinder(g,x,4.7,-4,.27,.27,.12,0x88705a,6);}
- for(const z of [-11,-7,-3,1,5]){levelBox(g,'cathedral arch beam',0,4.5,z,13,.22,.25,0x5b4c4b);for(const x of [-6,6])levelBox(g,'arch foot',x,2,z,.42,4,.45,0x373744);}
- // Red candles and a sunken altar.
- levelBox(g,'black altar',0,.65,-7,3,.9,1.3,0x2b252d);
- levelBox(g,'altar top',0,1.13,-7,3.3,.12,1.5,0x6a3c3e);
- for(const x of [-1,0,1]){levelCylinder(g,x,1.45,-7,.07,.07,.55,0xc6a36c);const flame=new THREE.Mesh(new THREE.ConeGeometry(.08,.2,5),new THREE.MeshBasicMaterial({color:0xff3d28}));flame.position.set(x,1.82,-7);g.add(flame);const l=new THREE.PointLight(0xff3228,1.6,3);l.position.set(x,1.8,-7);g.add(l);}
- for(let i=0;i<12;i++){const a=i*Math.PI/6;levelCylinder(g,Math.cos(a)*2.4,.03,-7+Math.sin(a)*2.4,.06,.06,.03,0xb44345,5);}
- levelCharacter(g,0,0,-9,'clara');
- const watcherModel=makeWatcher();watcherModel.position.set(2,0,-10);watcherModel.visible=true;g.add(watcherModel);watcherModel.position.x=2;
- return g;
-}
-buildDockLevel();buildWarehouseLevel();buildCathedralLevel();
-const dockTarget=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.MeshBasicMaterial({visible:false}));dockTarget.position.set(20,1,-3);scene.add(dockTarget);
-const dockExitTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2),new THREE.MeshBasicMaterial({visible:false}));dockExitTarget.position.set(20,1,-8.6);scene.add(dockExitTarget);
-const warehouseTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2.5),new THREE.MeshBasicMaterial({visible:false}));warehouseTarget.position.set(40,1.2,-5);scene.add(warehouseTarget);
-const hatchTarget=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,.4,10),new THREE.MeshBasicMaterial({visible:false}));hatchTarget.position.set(40,.1,-9.1);scene.add(hatchTarget);
-const altarTarget=new THREE.Mesh(new THREE.BoxGeometry(3,2,2),new THREE.MeshBasicMaterial({visible:false}));altarTarget.position.set(60,1,-7);scene.add(altarTarget);
-const levelExitTarget=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2),new THREE.MeshBasicMaterial({visible:false}));levelExitTarget.position.set(60,1,-11);scene.add(levelExitTarget);
-const levelStory={
- 1:[
-  ['COLE (V.O.)','Pier 14. The city ends here, or pretends to. Beyond the pilings, the bay keeps every secret it is paid to keep.'],
-  ['HARBOR WARDEN','You’re late. The tide’s been coming in for an hour, and the sirens started before the rain.'],
-  ['COLE','You always greet strangers with a weather report?'],
-  ['HARBOR WARDEN','Only the ones carrying a dead man’s name. Rook used to stand right there. Said the water had a memory. Then he went under in a dry room.'],
-  ['COLE','Where’s Warehouse 19?'],
-  ['HARBOR WARDEN','Follow the red lamps. If you hear someone you love calling from the water, don’t answer. It learns your voice.'],
-  ['COLE (V.O.)','The red lamps led north. So did the smell of hot copper, wet rope, and something sweet rotting below the boards.']
- ],
- 2:[
-  ['COLE (V.O.)','Warehouse 19 had been condemned twice, insured three times, and emptied on paper every winter for twelve years. The paper had never been inside.'],
-  ['CLARA?','Iris? Is that you? Please, I can’t see the door.'],
-  ['COLE','Clara Vance? Stay where you are.'],
-  ['CLARA?','He says the city is only a lid. He says everyone who drowned is still down there, waiting for the lid to lift.'],
-  ['COLE','Who is “he”?'],
-  ['THE WARDEN','Don’t touch the hatch. The Congregation feeds it names. A name is a hook. A memory is the line.'],
-  ['COLE (V.O.)','Under the crates I found a municipal seal, a rusted key, and a list of names. Clara’s was last. Mine was already written beneath it.'],
-  ['COLE','If this is a trap, it’s an expensive one.'],
-  ['CLARA?','Detective, the voice below has your face.']
- ],
- 3:[
-  ['COLE (V.O.)','The old drainage cathedral was built before the city had a name. Every flood-control map called it a culvert. Every map was a lie.'],
-  ['CLARA VANCE','Iris sent you. I knew she would. She never could leave a locked door alone.'],
-  ['COLE','You’re alive.'],
-  ['CLARA VANCE','Part of me. The rest is in the water, where they put all the things they didn’t want to bury. Rook opened the first gate. Vale ordered it sealed. The flood took the workers anyway.'],
-  ['COLE','And the Congregation?'],
-  ['CLARA VANCE','They think the dead can be brought back if enough living people remember them. They’re right about the remembering. Wrong about what answers.'],
-  ['THE WATCHER','Give us the name you miss most. We will give you the voice back.'],
-  ['COLE','I don’t bargain with things that hide in drains.'],
-  ['CLARA VANCE','You already have. Every night you come here in your dreams. The final gate needs a choice, Cole. Not a key.']
- ]
-};
-let levelSequence=null,levelSequenceIndex=0,levelVisited={1:false,2:false,3:false},warehouseInspected=false,finalChoiceShown=false,endingChoiceActive=false;
-function showLevelSequence(lines){if(document.pointerLockElement)document.exitPointerLock();levelSequence=lines;levelSequenceIndex=0;renderLevelLine();}
-function renderLevelLine(){const d=levelSequence[levelSequenceIndex];$('speaker').textContent=d[0];$('line').textContent=d[1];$('dialogue').style.display='block';if(d[0]==='THE WATCHER'){watcher.visible=true;}}
-function advanceDialogue(){if(endingChoiceActive)return;if(levelSequence){levelSequenceIndex++;if(levelSequenceIndex<levelSequence.length){renderLevelLine();return;}levelSequence=null;hideDialogue();return;}if(dialogueIndex>=0&&dialogueIndex<story.length-1)showDialogue(dialogueIndex+1);else finishConversation();}
-function setLevel(n){currentLevel=n;levelGroups.forEach((g,i)=>g.visible=(i===n-1));camera.position.set(n*20,1.65,n===1?3.5:n===2?3.5:3.5);yaw=0;pitch=0;camera.rotation.set(0,0,0);keys.KeyW=keys.KeyA=keys.KeyS=keys.KeyD=false;iris.visible=false;clara.visible=false;watcher.visible=false;deskLamp.intensity=n===0?deskLamp.intensity:0;scene.fog.color.set(n===1?0x102334:n===2?0x171923:0x160f1c);scene.fog.density=n===1?.045:n===2?.052:.06;$('fade').style.opacity='0';$('dialogue').style.display='none';$('chapterTitle').textContent=n===1?'Pier 14':n===2?'Warehouse 19':'The Drainage Cathedral';$('chapter').querySelector('.kicker').textContent=n===1?'ACT II · THE RED LAMPS':n===2?'ACT III · THE CITY UNDER THE CITY':'ACT IV · THE DEEP WELL';$('chapterText').textContent=n===1?'Rain runs uphill along the pier. Red lamps mark a route no city map admits exists.':n===2?'The warehouse is full of things the city claims it destroyed. Something below is speaking in familiar voices.':'Beneath the Basin, the drowned city gathers around a gate older than its streets.';$('objective').textContent=n===1?'OBJECTIVE: FIND WAREHOUSE 19':n===2?'OBJECTIVE: FIND THE HATCH':'OBJECTIVE: SPEAK TO CLARA';$('log').textContent=n===1?'NEW LOCATION — PIER 14':n===2?'NEW LOCATION — WAREHOUSE 19':'NEW LOCATION — DRAINAGE CATHEDRAL';}
-
-function showEndingPrompt(){
- if(document.pointerLockElement)document.exitPointerLock();
- levelSequence=null;dialogueIndex=-1;endingChoiceActive=true;
- $('speaker').textContent='THE DEEP WELL';
- $('line').textContent='COLE. We kept a place for you. We kept every name you tried to forget. Seal the gate and let the dead be dead, or open it and let the city remember everything.';
- $('dialogue').style.display='block';$('continue').style.display='none';$('endingChoices').style.display='flex';
- $('objective').textContent='FINAL CHOICE: SEAL THE GATE OR OPEN IT';
-}
-function finishEnding(seal){
- endingChoiceActive=false;$('endingChoices').style.display='none';$('continue').style.display='';
- $('fade').style.opacity='1';
- setTimeout(()=>{
-  if(seal){$('chapterTitle').textContent='The Quiet Below';$('chapterText').textContent='The gate seals. The voices stop. At dawn, Cole walks back into the rain carrying no proof, only the silence he chose.';$('log').textContent='ENDING UNLOCKED — THE QUIET BELOW';}
-  else{$('chapterTitle').textContent='The City Remembers';$('chapterText').textContent='The gate opens. Across the Basin, every drowned voice rises from the drains. Somewhere above, a child laughs in the rain.';$('log').textContent='ENDING UNLOCKED — THE CITY REMEMBERS';}
-  $('objective').textContent='CASE FILE 001 — END';$('dialogue').style.display='none';$('fade').style.opacity='0';finalChoiceShown=false;
-  $('chapter').querySelector('.kicker').textContent=seal?'ENDING A · THE QUIET BELOW':'ENDING B · THE CITY REMEMBERS';
-  $('line').textContent=seal?'The silence follows you home.':'Every drain in the Basin begins to sing.';
- },800);
-}
-$('sealEnding').addEventListener('click',()=>finishEnding(true));
-$('openEnding').addEventListener('click',()=>finishEnding(false));
-
-function interactLevel(){if(currentLevel===1&&currentTarget===dockExitTarget){$('fade').style.opacity='1';setTimeout(()=>{setLevel(2);showLevelSequence([['COLE (V.O.)','Warehouse 19 stood at the end of the pier like a missing tooth. The lock had been cut from the outside.'],['COLE','Someone wanted this place opened. They just didn’t want to be here when it happened.']]);},650);}
- else if(currentLevel===1&&currentTarget===dockTarget){if(!levelVisited[1]){levelVisited[1]=true;showLevelSequence(levelStory[1]);}else{$('log').textContent='The harbor warden will not meet your eyes. The red lamps point north.';}}
- else if(currentLevel===2&&currentTarget===warehouseTarget){if(!levelVisited[2]){levelVisited[2]=true;showLevelSequence(levelStory[2]);}else{$('log').textContent='The list of names lies where you left it. Your own name is still wet.';}}
- else if(currentLevel===2&&currentTarget===hatchTarget){if(!warehouseInspected){warehouseInspected=true;$('objective').textContent='OBJECTIVE: DESCEND TO THE DRAINAGE CATHEDRAL';$('log').textContent='CLUE: MUNICIPAL SEAL · THE HATCH IS UNLOCKED';showLevelSequence([['COLE','The key fits. Of course it fits. Someone wanted me to come down here.'],['COLE (V.O.)','The iron hatch swings open onto a staircase descending through black water. There should not be room beneath the city for this much dark.']]);}else{ $('fade').style.opacity='1';setTimeout(()=>setLevel(3),650);}} 
- else if(currentLevel===3&&currentTarget===altarTarget){if(!levelVisited[3]){levelVisited[3]=true;showLevelSequence(levelStory[3]);}else if(!finalChoiceShown){finalChoiceShown=true;showLevelSequence([['CLARA VANCE','The gate can be sealed, but the voice below will ask you for someone. It will use their voice. Don’t mistake wanting for love.'],['COLE','What happens if I open it?'],['CLARA VANCE','The drowned come back wrong. The living become the door.']]);$('objective').textContent='OBJECTIVE: CHOOSE THE FATE OF THE DEEP WELL';}}
- else if(currentLevel===3&&currentTarget===levelExitTarget&&finalChoiceShown){showEndingPrompt();}
- else if(currentLevel===3&&finalChoiceShown){showEndingPrompt();}
- else{$('log').textContent='Nothing here moves unless you give it a reason.';}}
-
-
-// Drifting smoke wisps: low-cost translucent sprites that catch the lamp glow.
-const smokePuffs=[];const smokeMat=new THREE.MeshBasicMaterial({color:0x777b80,transparent:true,opacity:.055,depthWrite:false,side:THREE.DoubleSide});
-for(let i=0;i<24;i++){const puff=new THREE.Mesh(new THREE.PlaneGeometry(.45+Math.random()*.8,.5+Math.random()*.9),smokeMat.clone());puff.position.set(-1.05+(Math.random()-.5)*1.6,1.55+Math.random()*1.7,-1.55+(Math.random()-.5)*1.3);puff.rotation.z=Math.random()*Math.PI;puff.material.opacity=.025+Math.random()*.035;scene.add(puff);smokePuffs.push({mesh:puff,seed:Math.random()*10});}
-
-// Interaction targets.
-const photoTarget=new THREE.Mesh(new THREE.BoxGeometry(.5,.2,.45),new THREE.MeshBasicMaterial({visible:false}));photoTarget.position.set(-.55,1.2,-1.18);scene.add(photoTarget);
-const doorTarget=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.8,.5),new THREE.MeshBasicMaterial({visible:false}));doorTarget.position.set(0,1.45,4.65);scene.add(doorTarget);
-const lampTarget=new THREE.Mesh(new THREE.SphereGeometry(.45),new THREE.MeshBasicMaterial({visible:false}));lampTarget.position.set(-1.08,1.55,-1.55);scene.add(lampTarget);
-const raycaster=new THREE.Raycaster();const center=new THREE.Vector2(0,0);
-const keys={};let started=false,locked=false,smoking=false,dialogueIndex=-1,doorOpened=false,photoRead=false,matchTimer=0,clock=new THREE.Clock(),time=0;
-let yaw=0,pitch=0, bob=0, moving=false, currentTarget=null, irisIntroduced=false, radioHeard=false, endingReached=false;
-const story=[
- {speaker:'COLE (V.O.)',line:'A man can drown in this city without ever touching the bay. All it takes is three missed payments and a badge turned in for scrap.'},
- {speaker:'COLE',line:'Door’s open. Unless you’re the landlord.'},
- {speaker:'IRIS VANCE',line:'Detective Cole? They told me at the precinct you don’t take orders from Commissioner Vale anymore.'},
- {speaker:'IRIS VANCE',line:'My sister Clara. Three nights missing. Not in the morgue, not in a cell. The police filed her under RUNAWAY before I finished giving them her name.'},
- {speaker:'COLE',line:'That’s how the Basin works. If the poor disappear, the paperwork gets lighter.'},
- {speaker:'IRIS VANCE',line:'I saw men in yellow slickers drag her into the storm line behind Pier 14. They called themselves the Congregation of the Sinking Sun.'},
- {speaker:'COLE',line:'A cult, a flooded tunnel, and a missing girl. You’re making a strong case for staying home.'},
- {speaker:'IRIS VANCE',line:'Then look at the photograph. Clara wore that pendant every day. Someone sent it back to me with a key and a note.'},
- {speaker:'COLE',line:'“The deep well is opening. Do not let her call me.” Who wrote this?'},
- {speaker:'IRIS VANCE',line:'Dr. Elias Rook. He ran the city’s flood-control project before they sealed the old sluice gates. He died twelve years ago.'},
- {speaker:'COLE',line:'Dead men are cheap witnesses. They never ask for a fee.'},
- {speaker:'IRIS VANCE',line:'Warehouse 19. Midnight. If Clara is alive, that is where they’ll take her. Please, Detective.'},
- {speaker:'COLE (V.O.)',line:'I had one working match, a bad knee, and a city full of people who’d rather believe in ghosts than admit what they’d done.'},
- {speaker:'RADIO DISPATCH',line:'Unit Nine to any available investigator. Reports of movement at Warehouse 19. Flood sirens are cycling without a control signal. Stay clear of the water.'},
- {speaker:'COLE',line:'Of course they are.'},
- {speaker:'THE WATCHER',line:'She has already heard the water speaking. You’re too late to stop the first door.'}
-];
-function showDialogue(index){if(document.pointerLockElement)document.exitPointerLock();levelSequence=null;dialogueIndex=index;const d=story[index];$('speaker').textContent=d.speaker;$('line').textContent=d.line;$('dialogue').style.display='block';if(d.speaker==='THE WATCHER'){watcher.visible=true;watcher.position.x=1.25;watcher.position.z=-4.15;clara.visible=true;}if(d.speaker==='RADIO DISPATCH'){radioHeard=true;$('log').textContent='RADIO FREQUENCY LOCKED — WAREHOUSE 19';}}
-function hideDialogue(){$('dialogue').style.display='none';$('endingChoices').style.display='none';$('continue').style.display='';endingChoiceActive=false;dialogueIndex=-1;}
-function finishConversation(){hideDialogue();irisIntroduced=true;iris.visible=true;$('objective').textContent=photoRead?'OBJECTIVE: FIND THE EXIT':'OBJECTIVE: INSPECT THE PHOTOGRAPH';$('chapterText').textContent='Iris waits beside the door, watching the rain. The photograph and iron key are the only leads you have.';}
-$('continue').addEventListener('click',advanceDialogue);
-function updateHint(){raycaster.setFromCamera(center,camera);const targets=[photoTarget,doorTarget,lampTarget,dockTarget,dockExitTarget,warehouseTarget,hatchTarget,altarTarget,levelExitTarget];const hits=raycaster.intersectObjects(targets,false);currentTarget=hits.length?hits[0].object:null;let text='';if(currentTarget===photoTarget)text=photoRead?'PHOTOGRAPH — EXAMINED':'E · EXAMINE PHOTOGRAPH';else if(currentTarget===doorTarget)text=doorOpened?'THE HALL IS DARK':'E · ANSWER THE DOOR';else if(currentTarget===lampTarget)text='A CHEAP DESK LAMP';else if(currentTarget===dockTarget)text='E · SPEAK TO THE HARBOR WARDEN';else if(currentTarget===dockExitTarget)text='E · FOLLOW THE RED LAMPS';else if(currentTarget===warehouseTarget)text='E · SEARCH THE WAREHOUSE';else if(currentTarget===hatchTarget)text=warehouseInspected?'E · DESCEND THE HATCH':'E · EXAMINE THE IRON HATCH';else if(currentTarget===altarTarget)text='E · SPEAK TO CLARA';else if(currentTarget===levelExitTarget)text='E · FACE THE DEEP WELL';$('hint').textContent=text;}
-function interact(){if($('dialogue').style.display==='block'){advanceDialogue();return;}if(currentLevel>0){interactLevel();return;}if(currentTarget===doorTarget){if(!doorOpened){doorOpened=true;door.rotation.y=-.95;door.position.x=-.68;knob.position.x=-.18;iris.visible=true;irisIntroduced=true;iris.position.set(0,0,3.55);$('chapterText').textContent='A soaked woman in a teal raincoat stands in the doorway, clutching a pigskin satchel.';$('objective').textContent='OBJECTIVE: HEAR IRIS OUT';showDialogue(1);}else if(photoRead&&!endingReached){endingReached=true;iris.visible=false;watcher.visible=true;watcher.position.set(1.3,0,-4.15);$('chapterTitle').textContent='The First Door';$('chapterText').textContent='The office seems to stretch as the lights fail. A shape stands behind the rain-streaked glass.';$('objective').textContent='CHAPTER I COMPLETE — THE BASIN IS CALLING';$('log').textContent='NEW LEAD: PIER 14 · FOLLOW THE RED LAMPS';$('fade').style.opacity='1';setTimeout(()=>{setLevel(1);showLevelSequence([['COLE (V.O.)','Pier 14. The city ends here, or pretends to. The bay is black glass beneath the red lamps.']]);},1300);}else{$('log').textContent='THE HALLWAY DISAPPEARS INTO RAIN AND SHADOW.';}}else if(currentTarget===photoTarget){photoRead=true;clara.visible=true;$('chapterTitle').textContent='The Photograph';$('chapterText').textContent='Clara Vance wears an antique silver pendant. The note on the back reads: “The deep well is opening. Do not let her call me.”';$('objective').textContent='CLUE RECORDED: THE DEEP WELL';$('log').textContent='CLUE LOG UPDATED — PENDANT, HANDWRITING, IRON KEY.';showCustom('COLE','The deep well is opening. Do not let her call me. Rook died twelve years ago. So who sent this?');}else if(currentTarget===lampTarget){deskLamp.intensity=deskLamp.intensity>1?2:19;$('log').textContent=deskLamp.intensity>2?'THE LAMP CATCHES, THROWING AMBER LIGHT OVER THE CLUES.':'THE ROOM FALLS BACK INTO BLUE SHADOW.';}else{$('log').textContent='A tired office. A bad lamp. Rain that won’t let up.';}}
-function showCustom(speaker,line){if(document.pointerLockElement)document.exitPointerLock();$('speaker').textContent=speaker;$('line').textContent=line;$('dialogue').style.display='block';dialogueIndex=story.length-1;}
-function toggleSmoke(){smoking=!smoking;matchTimer=smoking?9999:0;handGroup.visible=smoking;$('smokeValue').textContent=smoking?'LIT · SMOLDERING':'UNLIT';$('smokeBtn').textContent=smoking?'F · EXTINGUISH':'F · LIGHT CIGARETTE';emberLight.intensity=smoking?2.2:0;for(const p of cigSmoke){p.life=Math.random();p.mesh.visible=smoking;}if(smoking){$('log').textContent='The match catches. Smoke curls from the glowing tip.';playMatch();}else{$('log').textContent='The ember dies. The rain fills the silence.';for(const p of cigSmoke)p.mesh.visible=false;}}
-let audioCtx=null,master=null,ambientStarted=false;
-function startAudio(){if(ambientStarted)return;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();master=audioCtx.createGain();master.gain.value=.16;master.connect(audioCtx.destination);const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.15;const noise=audioCtx.createBufferSource();noise.buffer=buffer;noise.loop=true;const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=480;const g=audioCtx.createGain();g.gain.value=.17;noise.connect(filter);filter.connect(g);g.connect(master);noise.start();const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=48;const og=audioCtx.createGain();og.gain.value=.08;osc.connect(og);og.connect(master);osc.start();ambientStarted=true;}catch(e){}}
-function playMatch(){if(!audioCtx)return;const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(1500,t);osc.frequency.exponentialRampToValueAtTime(180,t+.12);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);osc.connect(g);g.connect(master);osc.start(t);osc.stop(t+.18);}
-function unlock(){if(!started)return;renderer.domElement.requestPointerLock?.();}
-renderer.domElement.addEventListener('click',()=>{if(started&&$('dialogue').style.display!=='block'&&matchMedia('(pointer:fine)').matches)unlock();});
-// Touch movement buttons hold their matching keyboard state; right-side dragging looks around.
-const touchUI=$('touchControls');
-for(const el of document.querySelectorAll('[data-key]')){
- const code=el.dataset.key;
- const down=e=>{e.preventDefault();keys[code]=true;el.style.background='#4b3826dd';if(e.pointerType==='touch'){try{el.setPointerCapture?.(e.pointerId);}catch(_){}}};
- const up=e=>{e.preventDefault();keys[code]=false;el.style.background='';};
- el.addEventListener('pointerdown',down);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);
-}
-$('touchInteract').addEventListener('pointerdown',e=>{e.preventDefault();if(e.pointerType==='touch'){try{$('touchInteract').setPointerCapture?.(e.pointerId);}catch(_){}}interact();});
-$('touchSmoke').addEventListener('pointerdown',e=>{e.preventDefault();if(e.pointerType==='touch'){try{$('touchSmoke').setPointerCapture?.(e.pointerId);}catch(_){}}toggleSmoke();});
-let lookPointer=null,lastTouchX=0,lastTouchY=0;
-renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!started||$('dialogue').style.display==='block')return;if(e.clientX<innerWidth*.38)return;lookPointer=e.pointerId;lastTouchX=e.clientX;lastTouchY=e.clientY;try{renderer.domElement.setPointerCapture(e.pointerId);}catch(_){}});
-renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||e.pointerId!==lookPointer||!started)return;const dx=e.clientX-lastTouchX,dy=e.clientY-lastTouchY;lastTouchX=e.clientX;lastTouchY=e.clientY;yaw-=dx*.006;pitch=THREE.MathUtils.clamp(pitch-dy*.006,-1.2,1.15);});
-const endLook=e=>{if(e.pointerId===lookPointer)lookPointer=null;};renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement;});
-document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=THREE.MathUtils.clamp(pitch,-1.2,1.15);});
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='KeyF'&&!e.repeat)toggleSmoke();if(e.code==='Enter'&&$('dialogue').style.display==='block')$('continue').click();if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();});
+const $=id=>document.getElementById(id);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x071020);scene.fog=new THREE.FogExp2(0x081323,.012);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.08,180);camera.position.set(0,1.68,10);
+const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});renderer.setPixelRatio(1);renderer.setSize(Math.max(320,Math.floor(innerWidth*.72)),Math.max(200,Math.floor(innerHeight*.72)),false);renderer.domElement.style.width='100vw';renderer.domElement.style.height='100dvh';renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.shadowMap.enabled=false;document.body.appendChild(renderer.domElement);
+const mat=(c,rough=1,metal=0,em=0)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal,emissive:c,emissiveIntensity:em});
+const M={asphalt:mat(0x101a29,.3,.45),concrete:mat(0x263447),dark:mat(0x080d18),steel:mat(0x35465b,.4,.7),window:mat(0x071d38,.22,.5),red:mat(0xff124a,.35,.15,2.5),cyan:mat(0x09cfff,.3,.1,2.1),blue:mat(0x1c4cff,.3,.1,1.8),yellow:mat(0xffbd38,.4,0,1.6),green:mat(0x16ffb1,.4,0,1.8),black:mat(0x090d14,.7,.25),rubber:mat(0x11151b),skin:mat(0x987260),coat:mat(0x202a3b),coat2:mat(0x4c1f37),white:mat(0xb2eaff,.4,0,.4)};
+scene.add(new THREE.HemisphereLight(0x5888c5,0x080813,1.1));
+const moon=new THREE.DirectionalLight(0x5b9dff,1.3);moon.position.set(-8,18,5);scene.add(moon);
+function box(x,y,z,w,h,d,material,group=scene){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);group.add(o);return o}
+function cyl(x,y,z,rt,rb,h,material,seg=8,group=scene){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),material);o.position.set(x,y,z);group.add(o);return o}
+function glow(color,intensity,pos,dist){const l=new THREE.PointLight(color,intensity,dist,2);l.position.set(...pos);scene.add(l);return l}
+function labelTexture(lines,color='#17dfff',bg='#061221'){const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,512,256);x.strokeStyle=color;x.lineWidth=8;x.strokeRect(7,7,498,242);x.shadowColor=color;x.shadowBlur=18;x.fillStyle=color;x.textAlign='center';x.textBaseline='middle';x.font='bold 60px monospace';if(!Array.isArray(lines))lines=[lines];const step=lines.length===1?0:64,start=128-(lines.length-1)*step/2;lines.forEach((s,i)=>x.fillText(s,256,start+i*step,460));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})}
+function sign(x,y,z,w,h,lines,color,bg){const g=new THREE.Group();g.position.set(x,y,z);box(0,0,0,w+.12,h+.12,.16,M.dark,g);const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),labelTexture(lines,color,bg));p.position.z=.09;g.add(p);scene.add(g);glow(color==='#ff174c'?0xff174c:color==='#00e5ff'?0x00cfff:0x5a42ff,3,[x,y,z+1],8);return g}
+// street and reflective, dark pavement
+box(0,-.24,-30,26,.45,115,M.asphalt);
+box(-13,-.05,-30,1,.5,115,M.concrete);box(13,-.05,-30,1,.5,115,M.concrete);
+for(let z=20;z>-83;z-=10){box(0,-.005,z, .13,.012,4,mat(0x32445b));}
+for(let i=0;i<90;i++){const x=(Math.random()-.5)*23,z=18-Math.random()*100;const p=box(x,.002,z,.1+Math.random()*.6,.009,.08+Math.random()*.9,[M.blue,M.red,M.cyan,M.yellow][i%4]);p.material=new THREE.MeshBasicMaterial({color:[0x0c79b5,0x6a102f,0x126b8d,0x775323][i%4],transparent:true,opacity:.13+Math.random()*.2});}
+// buildings and windows
+for(const side of [-1,1]){for(let i=0;i<11;i++){const z=13-i*9.3,w=4+Math.random()*3,h=8+Math.random()*20,x=side*(14+w/2);box(x,h/2-0.1,z,w,h,8,i%3===0?M.steel:M.dark);box(x-side*(w/2+.04),h/2,z,w*.03,h*.98,8.1,M.concrete);const faceX=x-side*(w/2+.08);for(let yy=2;yy<h-1;yy+=1.6){for(let xx=-w/2+.5;xx<w/2-.2;xx+=.85){if(Math.random()<.28)continue;const win=box(faceX,yy,z+Math.random()*6-3,.35,.55,.025,[M.cyan,M.blue,M.red,M.yellow][Math.floor(Math.random()*4)]);win.material=new THREE.MeshBasicMaterial({color:[0x0b719c,0x142b9b,0x8d123a,0x99722b][Math.floor(Math.random()*4)],transparent:true,opacity:.25+Math.random()*.5});}}for(let j=0;j<3;j++)box(x-side*(w/2+.15),h*.6+j*.8,z, .08,.06,6,M.cyan);}}
+sign(-10,5,2,3.2,3,['B','A','R'],'#ff174c','#210514');
+sign(-9.4,8,-7,4.8,2.6,['NEW YOU','TODAY'],'#16dfff','#061a4a');
+sign(10,6,-14,3.4,2.1,['MEDS','+'],'#12ffad','#031f1b');
+sign(5.5,13,-28,4.3,2.4,['ORION','BIOTECH'],'#615dff','#0c0a34');
+sign(0,3,-41,4.8,1.6,['DISTRICT ZERO'],'#14dfff','#031526');
+sign(-12,3,-20,2.7,1.3,['NO FUTURE'],'#ff174c','#210514');
+sign(12,4,-47,3.2,1.5,['KORO'],'#17dfff','#061221');
+// overhead walkways and cables
+for(const z of [-10,-32,-57]){box(0,5.2,z,19,.24,.5,M.steel);for(let x=-8;x<9;x+=2)box(x,5.05,z,.06,.06,.52,M.cyan);}
+for(let i=0;i<7;i++){const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-13,5+i%3,-5-i*8),new THREE.Vector3(-5,4+i%3,-8-i*8),new THREE.Vector3(4,4.5+i%3,-6-i*8),new THREE.Vector3(13,5+i%3,-9-i*8)]);scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve,24,.025,4,false),M.black));}
+// hovering traffic
+function makeCar(x,y,z,scale=1){const g=new THREE.Group();g.position.set(x,y,z);g.scale.setScalar(scale);box(0,0,0,2.8,.65,5,M.black,g);box(0,.43,-.25,2.05,.48,2.2,M.steel,g);box(0,.46,.88,2.5,.16,.18,M.cyan,g);box(-1.12,.02,2.53,.3,.16,.08,M.red,g);box(1.12,.02,2.53,.3,.16,.08,M.red,g);box(-1.12,.02,-2.53,.3,.16,.08,M.cyan,g);box(1.12,.02,-2.53,.3,.16,.08,M.cyan,g);scene.add(g);return g}
+const cars=[makeCar(2,.9,-24,.95),makeCar(-6,1.4,-49,.7),makeCar(7,1.2,-68,.8)];
+// street barriers, bins, vents, kiosks
+for(let i=0;i<8;i++){const z=8-i*9;box(-7,.55,z,.8,1.1,.8,M.steel);box(-7,1.12,z,.85,.07,.85,i%2?M.red:M.yellow);box(7,.45,z-3,1.2,.9,.9,M.dark);for(let k=0;k<4;k++)box(7,.2+k*.18,z-2.53,.7,.04,.03,M.steel);}
+box(-11,1.1,-11,1.5,2.2,1.1,M.dark);sign(-11,1.7,-10.42,1.2,.55,['DATA'],'#17dfff','#061221');
+// NPCs low-poly
+function person(x,z,coatColor=0x202b3b){const g=new THREE.Group();g.position.set(x,0,z);const cm=mat(coatColor),head=mat(0x8e6658),pants=mat(0x111925);const torso=new THREE.Mesh(new THREE.CylinderGeometry(.22,.31,.95,6),cm);torso.position.y=1.15;g.add(torso);const h=new THREE.Mesh(new THREE.SphereGeometry(.2,7,5),head);h.position.y=1.82;g.add(h);const hood=new THREE.Mesh(new THREE.SphereGeometry(.23,7,5),M.dark);hood.position.set(0,1.91,-.025);hood.scale.set(1,.6,1);g.add(hood);for(const s of [-1,1]){const leg=box(s*.12,.36,0,.14,.65,.17,pants,g);const arm=box(s*.3,1.17,0,.13,.66,.14,cm,g);arm.rotation.z=s*.13;}const eye=box(0,1.81,.185,.19,.035,.025,M.cyan,g);scene.add(g);return g}
+const npc=person(-2,-13,0x222b3c);npc.rotation.y=-.3;const npc2=person(4,-39,0x40202d);npc2.rotation.y=2.6;const npc3=person(-5,-42,0x263a3b);npc3.rotation.y=.2;
+// first-person sidearm
+const weapon=new THREE.Group();camera.add(weapon);box(.38,-.34,-.72,.25,.24,.62,M.black,weapon);box(.38,-.2,-.48,.19,.13,.48,M.steel,weapon);box(.38,-.34,-1.04,.12,.1,.08,M.cyan,weapon);const grip=box(.39,-.53,-.64,.17,.3,.2,M.black,weapon);grip.rotation.x=-.2;box(.38,-.28,-1.1,.09,.05,.07,M.red,weapon);box(.23,-.43,-.6,.14,.07,.25,M.skin,weapon);
+weapon.visible=false;
+const rainGeo=new THREE.BufferGeometry(),rainN=1300,rp=new Float32Array(rainN*6);for(let i=0;i<rainN;i++){let k=i*6;const x=(Math.random()-.5)*32,y=Math.random()*18,z=10-Math.random()*100;rp[k]=x;rp[k+1]=y;rp[k+2]=z;rp[k+3]=x-.1;rp[k+4]=y-.55;rp[k+5]=z;}rainGeo.setAttribute('position',new THREE.BufferAttribute(rp,3));scene.add(new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x5acaff,transparent:true,opacity:.42})));
+const puddles=[];for(let i=0;i<32;i++){const p=new THREE.Mesh(new THREE.CircleGeometry(.5+Math.random()*1.6,7),new THREE.MeshBasicMaterial({color:[0x0c4d8a,0x3d124b,0x086f84][i%3],transparent:true,opacity:.13,side:THREE.DoubleSide}));p.rotation.x=-Math.PI/2;p.position.set((Math.random()-.5)*20,.006,12-Math.random()*92);p.scale.y=.35;scene.add(p);puddles.push(p)}
+const map=$('map'),ctx=map.getContext('2d');function drawMap(){ctx.clearRect(0,0,146,146);ctx.fillStyle='#03101d';ctx.fillRect(0,0,146,146);ctx.strokeStyle='#0b4464';for(let i=0;i<146;i+=12){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,146);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(146,i);ctx.stroke()}ctx.fillStyle='#172c41';for(let y=4;y<146;y+=23){ctx.fillRect(8,y,34,15);ctx.fillRect(104,y+8,32,14)}ctx.strokeStyle='#0de1ff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(73,136);ctx.lineTo(73,10);ctx.stroke();ctx.fillStyle='#ff234f';ctx.fillRect(64,49,18,18);ctx.fillStyle='#f4ffff';ctx.beginPath();ctx.moveTo(73,74);ctx.lineTo(66,86);ctx.lineTo(80,86);ctx.fill();ctx.fillStyle='#8cefff';ctx.font='9px monospace';ctx.fillText('N',70,10)}drawMap();
+const keys={};let started=false,yaw=0,pitch=0,locked=false,ammo=12,toastTimer=0,objectiveStage=0,hasTalked=false,hacked=false;const clock=new THREE.Clock();let time=0,lookId=null,lastX=0,lastY=0;
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';toastTimer=3.2}
+function interact(){if(!started)return;if(objectiveStage===0){toast('MOTH: “You’re late. Orion is buying memories off the dead.”');hasTalked=true;objectiveStage=1;$('objective').innerHTML='CURRENT OBJECTIVE:<br><strong>◇ Hack the street terminal</strong><br>&nbsp;&nbsp;› Find the terminal marked DATA';$('hint').textContent='CONTACT FOUND · NEW LEAD ADDED';}else if(objectiveStage===1){toast('TERMINAL LOCKED. Press F to run a local intrusion.');}else{toast('MOTH: “The archive coordinates are yours. Get out before the drones notice.”');}}
+function hack(){if(!started)return;if(!hacked){hacked=true;objectiveStage=2;$('objective').innerHTML='CURRENT OBJECTIVE:<br><strong>✓ Data shard recovered</strong><br>&nbsp;&nbsp;› Escape District Zero';toast('ACCESS GRANTED · MEMORY SHARD DOWNLOADED · +250 XP');}else toast('TERMINAL CLEARED · NO NEW DATA');}
+function reload(){ammo=12;$('ammo').innerHTML=ammo+' <small>/ 48</small>';toast('K-9 SIDEARM RELOADED');}
+$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;weapon.visible=true;if(matchMedia('(pointer:coarse),(max-width:700px)').matches)$('touch').classList.add('active');if(matchMedia('(pointer:fine)').matches)renderer.domElement.requestPointerLock?.();toast('DISTRICT ZERO // LOCAL TIME 03:17');});
+renderer.domElement.addEventListener('click',()=>{if(started&&matchMedia('(pointer:fine)').matches&&!locked)renderer.domElement.requestPointerLock?.()});
+document.addEventListener('pointerlockchange',()=>locked=document.pointerLockElement===renderer.domElement);
+document.addEventListener('mousemove',e=>{if(!locked||!started)return;yaw-=e.movementX*.0022;pitch=THREE.MathUtils.clamp(pitch-e.movementY*.0022,-1.2,1.1)});
+for(const el of document.querySelectorAll('[data-key]')){const k=el.dataset.key;const down=e=>{e.preventDefault();keys[k]=true;el.style.background='#0b6584'};const up=e=>{e.preventDefault();keys[k]=false;el.style.background=''};el.addEventListener('pointerdown',down);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up)}
+$('talk').addEventListener('pointerdown',e=>{e.preventDefault();interact()});$('hack').addEventListener('pointerdown',e=>{e.preventDefault();hack()});$('reload').addEventListener('pointerdown',e=>{e.preventDefault();reload()});
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!started||e.clientX<innerWidth*.35)return;lookId=e.pointerId;lastX=e.clientX;lastY=e.clientY;try{renderer.domElement.setPointerCapture(e.pointerId)}catch(_){}});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;yaw-=dx*.006;pitch=THREE.MathUtils.clamp(pitch-dy*.006,-1.2,1.1)});
+renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerId===lookId)lookId=null});renderer.domElement.addEventListener('pointercancel',e=>{if(e.pointerId===lookId)lookId=null});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='KeyF'&&!e.repeat)hack();if(e.code==='KeyR'&&!e.repeat)reload();if(e.code==='KeyI'&&!e.repeat)toast('INVENTORY: K-9 SIDEARM · MEMORY SHARD '+(hacked?'[1]':'[0]')+' · MED PATCH [2]');if(e.code==='KeyM'&&!e.repeat)toast('MAP: YOU ARE IN SECTOR 09 · THE RED BAR IS MARKED');if(e.code==='Escape'&&document.pointerLockElement)document.exitPointerLock()});
 document.addEventListener('keyup',e=>keys[e.code]=false);
-$('smokeBtn').addEventListener('click',toggleSmoke);$('inspectBtn').addEventListener('click',interact);
-$('start').addEventListener('click',()=>{$('overlay').style.display='none';started=true;handGroup.visible=false;if(matchMedia('(pointer:coarse), (max-width:700px)').matches)touchUI.classList.add('active');startAudio();$('log').textContent='COLE (V.O.): “A man can drown in this city without ever touching the bay.”';$('objective').textContent='OBJECTIVE: ANSWER THE DOOR';renderer.domElement.requestPointerLock?.();});
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();resizePS1();});
-const clampRoom=()=>{if(currentLevel===0){camera.position.x=THREE.MathUtils.clamp(camera.position.x,-4.05,4.05);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-4.45,4.45);}else if(currentLevel===1){camera.position.x=THREE.MathUtils.clamp(camera.position.x,16.55,23.45);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-8.25,4.2);}else if(currentLevel===2){camera.position.x=THREE.MathUtils.clamp(camera.position.x,33.2,46.8);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-11,4.2);}else{camera.position.x=THREE.MathUtils.clamp(camera.position.x,54,66);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-12,4.2);}camera.position.y=1.65;};
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);time+=dt;
-  rainGeo.attributes.position.array.forEach((v,i)=>{if(i%6===1||i%6===4){rainGeo.attributes.position.array[i]-=dt*5;if(rainGeo.attributes.position.array[i]<-1)rainGeo.attributes.position.array[i]=8;}});
-  rainGeo.attributes.position.needsUpdate=true;
-  ceilingLamp.intensity=10+Math.sin(time*2.1)*1.1+(Math.random()<.012?-5:0);
-  windowLight.intensity=6+Math.sin(time*3.3)*2.0;
-  if(clara.visible&&currentLevel===0){clara.position.x=Math.sin(time*.55)*.045;clara.rotation.y=Math.sin(time*.3)*.06;clara.visible=photoRead||endingReached;}
-  if(watcher.visible){watcher.rotation.y=Math.sin(time*.8)*.035;}
-  for(const p of smokePuffs){p.mesh.position.y+=dt*(.06+(p.seed%4)*.018);p.mesh.position.x+=Math.sin(time*.35+p.seed)*dt*.035;p.mesh.material.opacity=(.018+(.5+.5*Math.sin(time*.7+p.seed))*.025)*(smoking?1.6:1);p.mesh.lookAt(camera.position);if(p.mesh.position.y>3.25){p.mesh.position.y=1.45;p.mesh.position.x=-1.05+(Math.random()-.5)*1.5;}}
-  if(smoking){for(const p of cigSmoke){p.life+=dt*.48;if(p.life>1)p.life=0;p.mesh.visible=true;p.mesh.position.set(.48+Math.sin(p.life*8+p.seed)*.045,-.28+p.life*.68,-.78);p.mesh.scale.setScalar(.35+p.life*1.9);p.mesh.material.opacity=(1-p.life)*.2;p.mesh.lookAt(camera.position);}}
-  if(started){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
-    const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let dx=0,dz=0;
-    if(keys.KeyW||keys.ArrowUp){dx+=forward.x;dz+=forward.z;}if(keys.KeyS||keys.ArrowDown){dx-=forward.x;dz-=forward.z;}if(keys.KeyA){dx-=right.x;dz-=right.z;}if(keys.KeyD){dx+=right.x;dz+=right.z;}
-    moving=dx!==0||dz!==0;if(moving){const l=Math.hypot(dx,dz)||1;camera.position.x+=dx/l*dt*2.1;camera.position.z+=dz/l*dt*2.1;bob+=dt*9;}clampRoom();camera.position.y=1.65+(moving?Math.sin(bob)*.018:Math.sin(time*1.2)*.006);
-    handGroup.position.y=smoking?Math.sin(time*2)*.006:0;
-    if(smoking){emberLight.intensity=1.8+Math.sin(time*18)*.5;ember.material.emissiveIntensity=2.5+Math.sin(time*14)*.9;}
-    updateHint();
-  }
-  renderer.render(scene,camera);
-}
-animate();
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(Math.max(320,Math.floor(innerWidth*.72)),Math.max(200,Math.floor(innerHeight*.72)),false);renderer.domElement.style.width='100vw';renderer.domElement.style.height='100dvh'}addEventListener('resize',resize);
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);time+=dt;const arr=rainGeo.attributes.position.array;for(let i=1;i<arr.length;i+=6){arr[i]-=dt*10;arr[i+3]-=dt*10;if(arr[i]<-1){arr[i]=17+Math.random()*3;arr[i+1]=arr[i];}}rainGeo.attributes.position.needsUpdate=true;cars.forEach((c,i)=>{c.position.x+=Math.sin(time*.18+i)*dt*.14;c.position.y+=Math.sin(time*1.4+i)*dt*.06});puddles.forEach((p,i)=>{p.material.opacity=.08+.08*(.5+.5*Math.sin(time*1.7+i))});if(started){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;const f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),r=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let dx=0,dz=0;if(keys.KeyW||keys.ArrowUp){dx+=f.x;dz+=f.z}if(keys.KeyS||keys.ArrowDown){dx-=f.x;dz-=f.z}if(keys.KeyA){dx-=r.x;dz-=r.z}if(keys.KeyD){dx+=r.x;dz+=r.z}if(dx||dz){const l=Math.hypot(dx,dz);camera.position.x+=dx/l*dt*4.1;camera.position.z+=dz/l*dt*4.1;weapon.position.y=Math.sin(time*12)*.012;weapon.position.x=Math.sin(time*6)*.008}else{weapon.position.y=0;weapon.position.x=0}camera.position.x=THREE.MathUtils.clamp(camera.position.x,-10.5,10.5);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-78,15);camera.position.y=1.68+Math.sin(time*1.3)*.006;
+const near=Math.hypot(camera.position.x+2,camera.position.z+13);if(near<3.4){$('hint').textContent='E · TALK TO MOTH';}else if(Math.hypot(camera.position.x+11,camera.position.z+11)<4){$('hint').textContent='F · HACK STREET TERMINAL';}else{$('hint').textContent='SECTOR 09 · FOLLOW THE NEON';}
+if(near<2.8&&keys.KeyE){interact();keys.KeyE=false}if(Math.hypot(camera.position.x+11,camera.position.z+11)<3.3&&keys.KeyF){hack();keys.KeyF=false}
+if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$('toast').style.display='none'}}
+renderer.render(scene,camera)}animate();
 </script>
-</body>
-</html>
+</body></html>
